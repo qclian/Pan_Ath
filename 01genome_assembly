@@ -1,0 +1,79 @@
+
+mkdir ../genome_assembly/AtAre1/01Nano_QC
+porechop -i ../raw_data/Nanopore_rawData/Nanopore_Are-1.fastq.gz -o ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.fastq.gz 
+filtlong --min_length 1000 --min_mean_q 70 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.fastq.gz | gzip > ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz
+
+
+######
+/opt/share/software/packages/Flye-2.7/bin/flye -o ../genome_assembly/AtAre1/02Flye_out00 -t 24 -g 135m --nano-raw ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz 
+
+mkdir ../genome_assembly/AtAre1/02Flye_out00/racon_out
+minimap2 -t 24 ../genome_assembly/AtAre1/02Flye_out00/assembly.fasta ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_1.paf
+racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_1.paf ../genome_assembly/AtAre1/02Flye_out00/assembly.fasta > ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round1.fasta
+minimap2 -t 24 ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round1.fasta ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_2.paf
+racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_2.paf ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round1.fasta > ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round2.fasta
+minimap2 -t 24 ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round2.fasta ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_3.paf
+racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_3.paf ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round2.fasta > ../genome_assembly/AtAre1/02Flye_out00/racon_out/assembly.racon_round3.fasta
+
+mkdir ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out && cd ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out
+ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz .
+ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
+ln -s ../assembly.racon_round3.fasta input.genome.fa
+cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
+bash ./run_nextpolish 
+
+minimap2 -x map-ont -t 20 ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/genome.nextpolish.fa ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz -o ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/AtAre1.flye_ass_polished.nano.paf 
+
+mkdir ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups 
+pbcstat -O ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/AtAre1.flye_ass_polished.nano.paf 
+calcuts ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/PB.stat > ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/cutoffs.auto 
+hist_plot.py -c ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/cutoffs.auto ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/PB.stat ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/PB.stat.auto.png
+
+split_fa ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/genome.nextpolish.fa > ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Are-1.flye_ass_polished.split 
+minimap2 -xasm5 -DP -t 20 ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Are-1.flye_ass_polished.split ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Are-1.flye_ass_polished.split -o ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Are-1.flye_ass_polished.split.self.paf 
+purge_dups -2 -T ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/cutoffs_manu -c ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/PB.base.cov ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Are-1.flye_ass_polished.split.self.paf > ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/dups.bed 
+get_seqs -e -p ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/dups.bed ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/genome.nextpolish.fa 
+minimap2 -x map-ont -t 20 ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.fa ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz -o ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.nano.paf
+
+mkdir ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/purge_dups 
+pbcstat -O ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/purge_dups ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.nano.paf 
+calcuts ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/purge_dups/PB.stat > ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/purge_dups/cutoffs.auto 
+hist_plot.py -c ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/purge_dups/cutoffs.auto ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/purge_dups/PB.stat ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/purge_dups/PB.stat.auto.png
+
+
+######
+smartdenovo.pl -c 1 -t 20 -J 1000 -k 16 -p ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.mak
+
+ln ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.dmo.cns ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.dmo.cns.fa 
+mkdir ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out
+minimap2 -t 24 ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.dmo.cns.fa ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_1.paf
+racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_1.paf ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.dmo.cns.fa > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/racon_round1.fasta
+minimap2 -t 24 ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/racon_round1.fasta ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_2.paf
+racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_2.paf ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/racon_round1.fasta > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/racon_round2.fasta
+minimap2 -t 24 ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/racon_round2.fasta ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_3.paf
+racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_3.paf ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/racon_round2.fasta > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/Are-1.smartdenovo.racon_round3.fasta
+
+mkdir ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out && cd ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out
+ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz .
+ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
+ln -s ../Are-1.smartdenovo.racon_round3.fasta input.genome.fa
+cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
+bash ./run_nextpolish > run_nextpolish.log 2>&1 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
