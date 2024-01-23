@@ -1,6 +1,25 @@
 
 ##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
 
+######
+bwa mem ../ref_genome/chloro_mito_phiX.fasta ../raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz ../raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz -t 20 > ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe.sam
+samtools view -@ 8 -bS ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe.sam | samtools sort -@ 20 - -o ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bam
+samtools view -@ 20 -b -f 77 ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bam > ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bothunmapped1.bam
+samtools view -@ 20 -b -f 141 ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bam > ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bothunmapped2.bam
+bedtools bamtofastq -i ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bothunmapped1.bam -fq ../raw_data/Illumina_rawData/Are-1_aln_pe_srt_1.fastq
+bedtools bamtofastq -i ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bothunmapped2.bam -fq ../raw_data/Illumina_rawData/Are-1_aln_pe_srt_2.fastq
+samtools flagstat -@ 20 ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bam > ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bam.flagstat
+gzip -f ../raw_data/Illumina_rawData/Are-1_aln_pe_srt_1.fastq
+gzip -f ../raw_data/Illumina_rawData/Are-1_aln_pe_srt_2.fastq
+zcat ../raw_data/Illumina_rawData/Are-1_aln_pe_srt_1.fastq.gz ../raw_data/Illumina_rawData/Are-1_aln_pe_srt_2.fastq.gz | jellyfish count /dev/fd/0 -C -o ../genome_assembly/AtAre1/00Kmer_est/Are-1.Illumina.jf -m 21 -t 20 -s 5G
+jellyfish histo -h 2000000 -o ../genome_assembly/AtAre1/00Kmer_est/Are-1.Illumina.jf.histo ../genome_assembly/AtAre1/00Kmer_est/Are-1.Illumina.jf
+gzip -f ../genome_assembly/AtAre1/00Kmer_est/Are-1.Illumina.jf
+rm ../genome_assembly/AtAre1/00Kmer_est/*sam
+
+Rscript ./run_findGSE ../genome_assembly/AtAre1/00Kmer_est/Are-1.Illumina.jf.histo ../genome_assembly/AtAre1/00Kmer_est/Are-1.Illumina.ndna.findGSE
+
+######
 mkdir ../genome_assembly/AtAre1/01Nano_QC
 porechop -i ../raw_data/Nanopore_rawData/Nanopore_Are-1.fastq.gz -o ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.fastq.gz 
 filtlong --min_length 1000 --min_mean_q 70 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.fastq.gz | gzip > ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz
@@ -59,11 +78,177 @@ ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_
 ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
 ln -s ../Are-1.smartdenovo.racon_round3.fasta input.genome.fa
 cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
-bash ./run_nextpolish > run_nextpolish.log 2>&1 
+bash ./run_nextpolish 
+
+mkdir ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups 
+pbcstat -O ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/AtAre1.smartdenovo_ass_polished.nano.paf 
+calcuts ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/PB.stat > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/cutoffs.auto 
+hist_plot.py -c ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/cutoffs.auto ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/PB.stat ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/PB.stat.auto.png
+
+split_fa ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/genome.nextpolish.fa > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/Are-1.smartdenovo_ass_polished.split 
+minimap2 -xasm5 -DP -t 20 ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/Are-1.smartdenovo_ass_polished.split ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/Are-1.smartdenovo_ass_polished.split -o ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/Are-1.smartdenovo_ass_polished.split.self.paf 
+purge_dups -2 -T ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/cutoffs_manu -c ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/PB.base.cov ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/Are-1.smartdenovo_ass_polished.split.self.paf > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/dups.bed 
+get_seqs -e -p ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/dups.bed ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/genome.nextpolish.fa 
+minimap2 -x map-ont -t 20 ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.fa ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz -o ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.nano.paf
+
+mkdir ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups 
+pbcstat -O ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.nano.paf 
+calcuts ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups/PB.stat > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups/cutoffs.auto 
+hist_plot.py -c ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups/cutoffs.auto ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups/PB.stat ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups/PB.stat.auto.png
+
+
+
+######
+nucmer -t 10 -p ../genome_assembly/AtAre1/05quickmerge_out/Are-1.smartdenovo_flye.aln ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.fa ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.fa
+delta-filter -r -q -l 10000 -i 0.9 ../genome_assembly/AtAre1/05quickmerge_out/Are-1.smartdenovo_flye.aln.delta > ../genome_assembly/AtAre1/05quickmerge_out/Are-1.smartdenovo_flye.aln.flt.delta 
+cd ../genome_assembly/AtAre1/05quickmerge_out 
+quickmerge -d Are-1.smartdenovo_flye.aln.flt.delta -q ../02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.fa -r ../03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.fa -hco 5.0 -c 1.5 -l 14172502 -ml 5000 -p Are-1.smartdenovo_flye.merge
+
+mkdir ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups 
+pbcstat -O ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups ../genome_assembly/AtAre1/04quickmerge_out00/Are-1.smartdenovo_flye_merge.nano.paf 
+calcuts ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/PB.stat > ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/cutoffs.auto 
+hist_plot.py -X 250 -c ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/cutoffs.auto ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/PB.stat ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/PB.stat.auto.png
+
+split_fa ../genome_assembly/AtAre1/04quickmerge_out00/merged.fasta > ../genome_assembly/AtAre1/04quickmerge_out00/Are-1.smartdenovo_flye_merge.split 
+minimap2 -xasm5 -DP -t 20 ../genome_assembly/AtAre1/04quickmerge_out00/Are-1.smartdenovo_flye_merge.split ../genome_assembly/AtAre1/04quickmerge_out00/Are-1.smartdenovo_flye_merge.split -o ../genome_assembly/AtAre1/04quickmerge_out00/Are-1.smartdenovo_flye_merge.split.self.paf 
+purge_dups -2 -T ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/cutoffs_manu -c ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/PB.base.cov ../genome_assembly/AtAre1/04quickmerge_out00/Are-1.smartdenovo_flye_merge.split.self.paf > ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/dups.bed 
+get_seqs -e -p ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/Are-1.smartdenovo_flye_merge ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/dups.bed ../genome_assembly/AtAre1/04quickmerge_out00/merged.fasta 
+minimap2 -x map-ont -t 20 ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/Are-1.smartdenovo_flye_merge.purged.fa ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz -o ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/Are-1.smartdenovo_flye_merge.purged.nano.paf 
+
+mkdir ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/purge_dups 
+pbcstat -O ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/purge_dups ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/Are-1.smartdenovo_flye_merge.purged.nano.paf 
+calcuts ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/purge_dups/PB.stat > ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/purge_dups/cutoffs.auto 
+hist_plot.py -X 250 -c ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/purge_dups/cutoffs.auto ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/purge_dups/PB.stat ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/purge_dups/PB.stat.auto.png
+
+
+######
+cd ../genome_assembly/AtAre1/04quickmerge_out00 
+ln -s ./purge_dups/Are-1.smartdenovo_flye_merge.purged.fa . 
+ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.fasta . 
+mv ./ragoo_output ./ragoo_output_tair10 
+ragoo.py -t 20 -R ../../../genome_assembly/AtAre1/01Canu_out/Nanopore_Are-1.trim.flt.correctedReads.fasta.gz -T corr -C ./Are-1.smartdenovo_flye_merge.purged.fa ./t2t-col.20210610.fasta > run_ragoo.t2t.logs 2>&1 
+mv ./ragoo_output ./ragoo_output_t2t 
+cd ./ragoo_output_t2t 
+ls ./orderings/* > orderings.fofn 
+samtools faidx ./ctg_alignments/Are-1.smartdenovo_flye_merge.purged.misasm.break.fa 
+make_agp.py orderings.fofn ./ctg_alignments/Are-1.smartdenovo_flye_merge.purged.misasm.break.fa.fai 100 > ragoo.agp
 
 
 
 
+##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
+
+######
+bwa mem ../ref_genome/chloro_mito_phiX.fasta ../raw_data/Illumina_allData/Illumina_Db-1_R1.fastq.gz ../raw_data/Illumina_allData/Illumina_Db-1_R2.fastq.gz -t 20 > ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe.sam
+samtools view -@ 8 -bS ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe.sam | samtools sort -@ 20 - -o ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bam
+samtools view -@ 20 -b -f 77 ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bam > ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bothunmapped1.bam
+samtools view -@ 20 -b -f 141 ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bam > ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bothunmapped2.bam
+bedtools bamtofastq -i ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bothunmapped1.bam -fq ../raw_data/Illumina_allData/Db-1_aln_pe_srt_1.fastq
+bedtools bamtofastq -i ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bothunmapped2.bam -fq ../raw_data/Illumina_allData/Db-1_aln_pe_srt_2.fastq
+samtools flagstat -@ 20 ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bam > ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bam.flagstat
+gzip -f ../raw_data/Illumina_allData/Db-1_aln_pe_srt_1.fastq
+gzip -f ../raw_data/Illumina_allData/Db-1_aln_pe_srt_2.fastq
+zcat ../raw_data/Illumina_allData/Db-1_aln_pe_srt_1.fastq.gz ../raw_data/Illumina_allData/Db-1_aln_pe_srt_2.fastq.gz | jellyfish count /dev/fd/0 -C -o ../genome_assembly/Db-1/00Kmer_est/Db-1.Illumina.jf -m 21 -t 20 -s 5G
+jellyfish histo -h 2000000 -o ../genome_assembly/Db-1/00Kmer_est/Db-1.Illumina.jf.histo ../genome_assembly/Db-1/00Kmer_est/Db-1.Illumina.jf
+gzip -f ../genome_assembly/Db-1/00Kmer_est/Db-1.Illumina.jf
+rm ../genome_assembly/Db-1/00Kmer_est/*sam
+
+Rscript ./run_findGSE ../genome_assembly/Db-1/00Kmer_est/Db-1.Illumina.jf.histo ../genome_assembly/Db-1/00Kmer_est/Db-1.Illumina.ndna.findGSE
+
+######
+canu -assemble -p Db-1.canu_ass -d ../genome_assembly/Db-1/01Canu_out maxThreads=20 genomeSize=135m -pacbio-hifi ../raw_data/batch1/5129_A.hifi_reads.fastq.gz > ../genome_assembly/Db-1/01Canu_out/run.canu.logs
+
+mkdir ../genome_assembly/Db-1/01Canu_out/purge_dups 
+pbcstat -O ../genome_assembly/Db-1/01Canu_out/purge_dups ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.hifi.paf 
+calcuts ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.stat > ../genome_assembly/Db-1/01Canu_out/purge_dups/cutoffs.auto 
+hist_plot.py -c ../genome_assembly/Db-1/01Canu_out/purge_dups/cutoffs.auto ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.stat ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.stat.auto.png
+
+calcuts -l 9 -m 27 -u 108 ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.stat > ../genome_assembly/Db-1/01Canu_out/purge_dups/cutoffs_manu 
+hist_plot.py -c ../genome_assembly/Db-1/01Canu_out/purge_dups/cutoffs_manu ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.stat ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.stat.manu.png
+
+split_fa ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.contigs.fasta > ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.split 
+minimap2 -xasm5 -DP -t 20 ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.split ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.split -o ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.split.self.paf 
+purge_dups -2 -T ../genome_assembly/Db-1/01Canu_out/purge_dups/cutoffs_manu -c ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.base.cov ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.split.self.paf > ../genome_assembly/Db-1/01Canu_out/purge_dups/dups.bed 
+get_seqs -e -p ../genome_assembly/Db-1/01Canu_out/purge_dups/Db-1.canu_ass ../genome_assembly/Db-1/01Canu_out/purge_dups/dups.bed ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.contigs.fasta 
+
+######
+/opt/share/software/packages/Flye-2.7/bin/flye -o ../genome_assembly/Db-1/02Flye_out00 -t 20 -g 135m --pacbio-hifi ../raw_data/batch1/5129_A.hifi_reads.fastq.gz > ../genome_assembly/Db-1/02Flye_out00/run.flye.logs
+
+mkdir ../genome_assembly/Db-1/02Flye_out00/purge_dups 
+pbcstat -O ../genome_assembly/Db-1/02Flye_out00/purge_dups ../genome_assembly/Db-1/02Flye_out00/Db-1.flye_ass.hifi.paf 
+calcuts ../genome_assembly/Db-1/02Flye_out00/purge_dups/PB.stat > ../genome_assembly/Db-1/02Flye_out00/purge_dups/cutoffs.auto 
+hist_plot.py -c ../genome_assembly/Db-1/02Flye_out00/purge_dups/cutoffs.auto ../genome_assembly/Db-1/02Flye_out00/purge_dups/PB.stat ../genome_assembly/Db-1/02Flye_out00/purge_dups/PB.stat.auto.png
+
+
+######
+hifiasm -o ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass -t 20 -l0 ../raw_data/batch1/5129_A.hifi_reads.fastq.gz > ../genome_assembly/Db-1/03Hifiasm_out00/run.hifiasm.logs
+awk '/^S/{print ">"$2"\n"$3}' ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.bp.p_ctg.gfa | fold > ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.bp.p_ctg.fa
+
+mkdir ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups 
+pbcstat -O ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.hifi.paf 
+calcuts ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/PB.stat > ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/cutoffs.auto 
+hist_plot.py -c ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/cutoffs.auto ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/PB.stat ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/PB.stat.auto.png
+
+calcuts -l 7 -m 27 -u 108 ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/PB.stat > ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/cutoffs_manu 
+hist_plot.py -c ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/cutoffs_manu ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/PB.stat ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/PB.stat.manu.png
+
+split_fa ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.bp.p_ctg.fa > ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.split 
+minimap2 -xasm5 -DP -t 20 ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.split ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.split -o ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.split.self.paf 
+purge_dups -2 -T ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/cutoffs_manu -c ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/PB.base.cov ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.split.self.paf > ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/dups.bed 
+get_seqs -e -p ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/dups.bed ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.bp.p_ctg.fa 
+
+minimap2 -x map-hifi -t 4 ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass.purged.fa ../raw_data/batch1/5129_A.hifi_reads.fastq.gz -o ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass.purged.hifi.paf 
+mkdir ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups 
+pbcstat -O ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass.purged.hifi.paf 
+calcuts ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/PB.stat > ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/cutoffs.auto 
+hist_plot.py -c ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/cutoffs.auto ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/PB.stat ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/PB.stat.auto.png
+
+######
+nucmer -t 4 -p ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm.aln ../genome_assembly/Db-1/02Flye_out00/assembly.fasta ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass.purged.fa
+delta-filter -r -q -l 10000 -i 0.9 ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm.aln.delta > ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm.aln.flt.delta 
+cd ../genome_assembly/Db-1/04quickmerge_out000 
+quickmerge -d Db-1.flye_hifiasm.aln.flt.delta -q ../03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass.purged.fa -r ../02Flye_out00/assembly.fasta -hco 5.0 -c 1.5 -l 13382534 -ml 5000 -p Db-1.flye_hifiasm.merge
+
+cd ../genome_assembly/Db-1/04quickmerge_out000/ 
+mv merged.fasta Db-1.flye_hifiasm.merged.fasta 
+mv anchor_summary.txt Db-1.flye_hifiasm.anchor_summary.txt 
+mv summaryOut.txt Db-1.flye_hifiasm.summaryOut.txt 
+mv aln_summary.tsv Db-1.flye_hifiasm.aln_summary.txt
+
+mkdir ../genome_assembly/Db-1/04quickmerge_out000/purge_dups 
+pbcstat -O ../genome_assembly/Db-1/04quickmerge_out000/purge_dups ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm_merge.hifi.paf 
+calcuts ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/PB.stat > ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/cutoffs.auto 
+hist_plot.py -X 200 -c ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/cutoffs.auto ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/PB.stat ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/PB.stat.auto.png
+
+nucmer -t 4 -p ../genome_assembly/Db-1/04quickmerge_out000/Db-1.canu_flye_hifiasm.aln ../genome_assembly/Db-1/01Canu_out/purge_dups/Db-1.canu_ass.purged.fa ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm.merged.fasta
+delta-filter -r -q -l 10000 -i 0.9 ../genome_assembly/Db-1/04quickmerge_out000/Db-1.canu_flye_hifiasm.aln.delta > ../genome_assembly/Db-1/04quickmerge_out000/Db-1.canu_flye_hifiasm.aln.flt.delta 
+cd ../genome_assembly/Db-1/04quickmerge_out000 
+quickmerge -d Db-1.canu_flye_hifiasm.aln.flt.delta -q ./Db-1.flye_hifiasm.merged.fasta -r ../01Canu_out/purge_dups/Db-1.canu_ass.purged.fa -hco 5.0 -c 1.5 -l 12446511 -ml 5000 -p Db-1.canu_flye_hifiasm.merge 
+
+cd ../genome_assembly/Db-1/04quickmerge_out000/ 
+mv merged.fasta Db-1.canu_flye_hifiasm.merged.fasta 
+mv anchor_summary.txt Db-1.canu_flye_hifiasm.anchor_summary.txt 
+mv summaryOut.txt Db-1.canu_flye_hifiasm.summaryOut.txt 
+mv aln_summary.tsv Db-1.canu_flye_hifiasm.aln_summary.txt
+
+mkdir ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2 
+pbcstat -O ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2 ../genome_assembly/Db-1/04quickmerge_out000/Db-1.canu_flye_hifiasm_merge.hifi.paf 
+calcuts ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/PB.stat > ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/cutoffs.auto 
+hist_plot.py -X 200 -c ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/cutoffs.auto ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/PB.stat ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/PB.stat.auto.png
+
+cd ../genome_assembly/Db-1/04quickmerge_out000 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.fasta . 
+ragoo.py -t 20 -R /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/batch1/5129_A.hifi_reads.fastq.gz -T corr -C ./Db-1.canu_flye_hifiasm.merged.fasta ./t2t-col.20210610.fasta 
+mv ./ragoo_output ./ragoo_output_t2t 
+cd ./ragoo_output_t2t 
+ls ./orderings/* > orderings.fofn 
+samtools faidx ./ctg_alignments/Db-1.canu_flye_hifiasm.merged.misasm.break.fa 
+make_agp.py orderings.fofn ./ctg_alignments/Db-1.canu_flye_hifiasm.merged.misasm.break.fa.fai 100 > ragoo.agp
+
+
+##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
 
 
 
