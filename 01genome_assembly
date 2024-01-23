@@ -1,8 +1,9 @@
 
+##########################################################################################################################################################################################################################################################################################################################################
+
 mkdir ../genome_assembly/AtAre1/01Nano_QC
 porechop -i ../raw_data/Nanopore_rawData/Nanopore_Are-1.fastq.gz -o ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.fastq.gz 
 filtlong --min_length 1000 --min_mean_q 70 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.fastq.gz | gzip > ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz
-
 
 ######
 /opt/share/software/packages/Flye-2.7/bin/flye -o ../genome_assembly/AtAre1/02Flye_out00 -t 24 -g 135m --nano-raw ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz 
