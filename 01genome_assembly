@@ -153,8 +153,10 @@ make_agp.py orderings.fofn ./ctg_alignments/Are-1.smartdenovo_flye_merge.purged.
 
 ##########################################################################################################################################################################################################################################################################################################################################
 ##########################################################################################################################################################################################################################################################################################################################################
+#Pacbio HiFi accessions, use Db-1 as an example
 
 ######
+#Estimate genome size using Illumina short reads dataset
 bwa mem ../ref_genome/chloro_mito_phiX.fasta ../raw_data/Illumina_allData/Illumina_Db-1_R1.fastq.gz ../raw_data/Illumina_allData/Illumina_Db-1_R2.fastq.gz -t 20 > ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe.sam
 samtools view -@ 8 -bS ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe.sam | samtools sort -@ 20 - -o ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bam
 samtools view -@ 20 -b -f 77 ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bam > ../genome_assembly/Db-1/00Kmer_est/Db-1_aln_pe_sorted.bothunmapped1.bam
@@ -171,9 +173,12 @@ rm ../genome_assembly/Db-1/00Kmer_est/*sam
 
 Rscript ./run_findGSE ../genome_assembly/Db-1/00Kmer_est/Db-1.Illumina.jf.histo ../genome_assembly/Db-1/00Kmer_est/Db-1.Illumina.ndna.findGSE
 
+
 ######
+#assembly using canu
 canu -assemble -p Db-1.canu_ass -d ../genome_assembly/Db-1/01Canu_out maxThreads=20 genomeSize=135m -pacbio-hifi ../raw_data/batch1/5129_A.hifi_reads.fastq.gz > ../genome_assembly/Db-1/01Canu_out/run.canu.logs
 
+#purge canu assembly
 mkdir ../genome_assembly/Db-1/01Canu_out/purge_dups 
 pbcstat -O ../genome_assembly/Db-1/01Canu_out/purge_dups ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.hifi.paf 
 calcuts ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.stat > ../genome_assembly/Db-1/01Canu_out/purge_dups/cutoffs.auto 
@@ -187,9 +192,12 @@ minimap2 -xasm5 -DP -t 20 ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.split
 purge_dups -2 -T ../genome_assembly/Db-1/01Canu_out/purge_dups/cutoffs_manu -c ../genome_assembly/Db-1/01Canu_out/purge_dups/PB.base.cov ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.split.self.paf > ../genome_assembly/Db-1/01Canu_out/purge_dups/dups.bed 
 get_seqs -e -p ../genome_assembly/Db-1/01Canu_out/purge_dups/Db-1.canu_ass ../genome_assembly/Db-1/01Canu_out/purge_dups/dups.bed ../genome_assembly/Db-1/01Canu_out/Db-1.canu_ass.contigs.fasta 
 
+
 ######
+#assembly using flye
 /opt/share/software/packages/Flye-2.7/bin/flye -o ../genome_assembly/Db-1/02Flye_out00 -t 20 -g 135m --pacbio-hifi ../raw_data/batch1/5129_A.hifi_reads.fastq.gz > ../genome_assembly/Db-1/02Flye_out00/run.flye.logs
 
+#purge flye assembly
 mkdir ../genome_assembly/Db-1/02Flye_out00/purge_dups 
 pbcstat -O ../genome_assembly/Db-1/02Flye_out00/purge_dups ../genome_assembly/Db-1/02Flye_out00/Db-1.flye_ass.hifi.paf 
 calcuts ../genome_assembly/Db-1/02Flye_out00/purge_dups/PB.stat > ../genome_assembly/Db-1/02Flye_out00/purge_dups/cutoffs.auto 
@@ -197,9 +205,11 @@ hist_plot.py -c ../genome_assembly/Db-1/02Flye_out00/purge_dups/cutoffs.auto ../
 
 
 ######
+#assembly using hifiasm
 hifiasm -o ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass -t 20 -l0 ../raw_data/batch1/5129_A.hifi_reads.fastq.gz > ../genome_assembly/Db-1/03Hifiasm_out00/run.hifiasm.logs
 awk '/^S/{print ">"$2"\n"$3}' ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.bp.p_ctg.gfa | fold > ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.bp.p_ctg.fa
 
+#purge hifiasm assembly
 mkdir ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups 
 pbcstat -O ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups ../genome_assembly/Db-1/03Hifiasm_out00/Db-1.hifiasm_ass.hifi.paf 
 calcuts ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/PB.stat > ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/cutoffs.auto 
@@ -219,7 +229,10 @@ pbcstat -O ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups ../geno
 calcuts ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/PB.stat > ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/cutoffs.auto 
 hist_plot.py -c ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/cutoffs.auto ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/PB.stat ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/purge_dups/PB.stat.auto.png
 
+
 ######
+#merge canu, flye and hifiasm assemblies using quickmerge
+#first round quickmerge
 nucmer -t 4 -p ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm.aln ../genome_assembly/Db-1/02Flye_out00/assembly.fasta ../genome_assembly/Db-1/03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass.purged.fa
 delta-filter -r -q -l 10000 -i 0.9 ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm.aln.delta > ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm.aln.flt.delta 
 cd ../genome_assembly/Db-1/04quickmerge_out000 
@@ -236,6 +249,7 @@ pbcstat -O ../genome_assembly/Db-1/04quickmerge_out000/purge_dups ../genome_asse
 calcuts ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/PB.stat > ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/cutoffs.auto 
 hist_plot.py -X 200 -c ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/cutoffs.auto ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/PB.stat ../genome_assembly/Db-1/04quickmerge_out000/purge_dups/PB.stat.auto.png
 
+#second round quickmerge
 nucmer -t 4 -p ../genome_assembly/Db-1/04quickmerge_out000/Db-1.canu_flye_hifiasm.aln ../genome_assembly/Db-1/01Canu_out/purge_dups/Db-1.canu_ass.purged.fa ../genome_assembly/Db-1/04quickmerge_out000/Db-1.flye_hifiasm.merged.fasta
 delta-filter -r -q -l 10000 -i 0.9 ../genome_assembly/Db-1/04quickmerge_out000/Db-1.canu_flye_hifiasm.aln.delta > ../genome_assembly/Db-1/04quickmerge_out000/Db-1.canu_flye_hifiasm.aln.flt.delta 
 cd ../genome_assembly/Db-1/04quickmerge_out000 
@@ -252,6 +266,9 @@ pbcstat -O ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2 ../genome_ass
 calcuts ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/PB.stat > ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/cutoffs.auto 
 hist_plot.py -X 200 -c ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/cutoffs.auto ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/PB.stat ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/PB.stat.auto.png
 
+
+######
+#scaffolding
 cd ../genome_assembly/Db-1/04quickmerge_out000 
 ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.fasta . 
 ragoo.py -t 20 -R /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/batch1/5129_A.hifi_reads.fastq.gz -T corr -C ./Db-1.canu_flye_hifiasm.merged.fasta ./t2t-col.20210610.fasta 
