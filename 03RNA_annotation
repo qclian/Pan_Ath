@@ -2,7 +2,7 @@
 ##########################################################################################################################################################################################################################################################################################################################################
 
 ######
-#Annoate RNAS, use Db-1 as an example
+#Annoate RNAs, use Db-1 as an example
 
 #Barrnap
 barrnap --threads 4 --kingdom euk -o ../genome_assembly/Db-1/05RNA_anno/Db-1.barrnap.rrna.fa < ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta > ../genome_assembly/Db-1/05RNA_anno/Db-1.barrnap.rrna.gff
