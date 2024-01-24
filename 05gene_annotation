@@ -94,7 +94,26 @@ pthreadrun ./run_exonerate_gff_to_alignment_gff3_panPEP 1 10 > ./nohup.run_exone
 cat ./Db-1.panPEP.chunk-*.gff3 | bedtools sort -i - > ./Db-1.panPEP.exonerate.gff3
 
 
-
+#EVidenceModeler
+cd ../genome_assembly/Db-1/07Gene_anno/07EVM_out/ 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+cat ../02Augustus_out/Db-1.augustus.gff3 ../03GeneMark_out/Db-1.genemark.gff3 ../04GlimmerHMM_out/Db-1.glimmerhmm.gff3 ../06SNAP_out/Db-1.snap.gff3 > denovo.gff3 
+cat ../05Exonerate_out/Db-1.Ath.exonerate.gff3 | sed "s/exonerate/exonerate.Ath/g" > exonerate.v2.gff3 
+cat ../05Exonerate_out/Db-1.Aly.exonerate.gff3 | sed "s/exonerate/exonerate.Aly/g" >> exonerate.v2.gff3 
+cat ../05Exonerate_out/Db-1.Sly.exonerate.gff3 | sed "s/exonerate/exonerate.Sly/g" >> exonerate.v2.gff3 
+cat ../05Exonerate_out/Db-1.Osa.exonerate.gff3 | sed "s/exonerate/exonerate.Osa/g" >> exonerate.v2.gff3 
+cat ../05Exonerate_out/Db-1.panPEP.exonerate.gff3 | sed "s/exonerate/exonerate.panPEP/g" >> exonerate.v2.gff3 
+partition_EVM_inputs.pl --genome genome.fa --gene_predictions denovo.gff3 --protein_alignments exonerate.v2.gff3 --segmentSize 100000 --overlapSize 10000 --partition_listing partitions_list.out > nohup.partition_EVM_inputs.log 2>&1 
+write_EVM_commands.pl --genome genome.fa --weights /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/evidencemodeler_weights.v2.txt --gene_predictions denovo.gff3 --protein_alignments exonerate.v2.gff3 --output_file_name evm.out.v2 --partitions partitions_list.out > commands.list.v2 
+pthreadrun ./commands.list.v2 1 2 > nohup.run_evm.v2.log 2>&1 
+recombine_EVM_partial_outputs.pl --partitions partitions_list.out --output_file_name evm.out.v2 > nohup.recombine_EVM_partial_outputs.v2.log 2>&1 
+convert_EVM_outputs_to_GFF3.pl --partitions partitions_list.out --output evm.out.v2 --genome genome.fa > nohup.convert_EVM_outputs_to_GFF3.v2.log 2>&1 
+find . -regex ".*evm.out.v2.gff3" | sort -V | xargs cat | grep EVM > Db-1.EVM.v2.gff 
+cat Db-1.EVM.v2.gff | awk 'BEGIN{OFS="\t";acc="Db1";print "##gff-version 3"}{if($1 in chrs){chrs[$1]=1}else{chrs[$1]=1;if($1~/Chr/){split($1,a,"Chr");chr_id=a[2];idx=10000}else{if(chr_id!="U"){idx=10000};chr_id="U"}};if($3=="gene"){idx+=10;gene_id="AT"acc"-"chr_id"G"idx; print $1,$2,$3,$4,$5,$6,$7,$8,"ID="gene_id;exon_id=0;cds_id=0};if($3=="mRNA"){mrna_id="AT"acc"-"chr_id"G"idx".1"; print $1,$2,$3,$4,$5,$6,$7,$8,"ID="mrna_id";Parent="gene_id};if($3=="exon"){exon_id+=1; print $1,$2,$3,$4,$5,$6,$7,$8,"ID="mrna_id".exon"exon_id";Parent="mrna_id};if($3=="CDS"){cds_id+=1; print $1,$2,$3,$4,$5,$6,$7,$8,"ID="mrna_id".cds"cds_id";Parent="mrna_id}}' > Db-1.EVM.v2.5.gff 
+gff3_file_to_proteins.pl Db-1.EVM.v2.5.gff genome.fa prot | sed "s/\.1.*//g" 1> Db-1.EVM.v2.5.protein.fasta 2> nohup.gff3_file_to_proteins.prot.v2.5.log 
+gff3_file_to_proteins.pl Db-1.EVM.v2.5.gff genome.fa CDS | sed "s/\.1.*//g" 1> Db-1.EVM.v2.5.CDS.fasta 2> nohup.gff3_file_to_proteins.cds.v2.5.log 
+gff3_file_to_proteins.pl Db-1.EVM.v2.5.gff genome.fa cDNA | sed "s/\.1.*//g" 1> Db-1.EVM.v2.5.cDNA.fasta 2> nohup.gff3_file_to_proteins.cdna.v2.5.log 
+gff3_file_to_proteins.pl Db-1.EVM.v2.5.gff genome.fa gene | sed "s/\.1.*//g" 1> Db-1.EVM.v2.5.gene.fasta 2> nohup.gff3_file_to_proteins.gene.v2.5.log 
 
 
 
