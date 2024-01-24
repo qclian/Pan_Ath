@@ -4,6 +4,10 @@
 ######
 #Annoate TEs, use Db-1 as an example
 
+cd ../genome_assembly/Db-1/06TE_anno00 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish_corr/ragoo.fasta genome.fa 
+EDTA.pl --genome ./genome.fa --cds /netscratch/dep_mercier/grp_mercier/Databases/Ath_refGenome/Athaliana_447_Araport11.cds_primaryTranscriptOnly.fa --overwrite 1 --sensitive 1 --anno 1 --evaluate 1 --threads 8 > nohup.run_edta.logs 2>&1
+
 
 ##########################################################################################################################################################################################################################################################################################################################################
 ##########################################################################################################################################################################################################################################################################################################################################
