@@ -8,7 +8,7 @@
 barrnap --threads 4 --kingdom euk -o ../genome_assembly/Db-1/05RNA_anno/Db-1.barrnap.rrna.fa < ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta > ../genome_assembly/Db-1/05RNA_anno/Db-1.barrnap.rrna.gff
 
 #Infernal
-cmscan --cpu 8 --tblout ../genome_assembly/Db-1/05RNA_anno/Db-1.Rfam.scan.out /netscratch/dep_mercier/grp_mercier/Databases/Rfam14.8/Rfam.cm ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta > ../genome_assembly/Db-1/05RNA_anno/Db-1.Rfam.scan.out.log 2>&1 
+cmscan --cpu 8 --tblout ../genome_assembly/Db-1/05RNA_anno/Db-1.Rfam.scan.out /xxx/Databases/Rfam14.8/Rfam.cm ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta > ../genome_assembly/Db-1/05RNA_anno/Db-1.Rfam.scan.out.log 2>&1 
 
 #tRNAscan-SE
 tRNAscan-SE -o ../genome_assembly/Db-1/05RNA_anno/Db-1.tRNA.out -f ../genome_assembly/Db-1/05RNA_anno/Db-1.tRNA.ss -m ../genome_assembly/Db-1/05RNA_anno/Db-1.tRNA.stats -j ../genome_assembly/Db-1/05RNA_anno/Db-1.tRNA.gff3 -l ../genome_assembly/Db-1/05RNA_anno/Db-1.tRNA.log --thread 4 ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta
