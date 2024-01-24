@@ -43,10 +43,10 @@ racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../gen
 
 #polished flye assembly using nextpolish with Illumina short reads
 mkdir ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out && cd ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out
-ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz .
-ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
+ln -s /xxx/raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz .
+ln -s /xxx/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
 ln -s ../assembly.racon_round3.fasta input.genome.fa
-cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
+cat /xxx/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
 bash ./run_nextpolish 
 
 #purge flye assembly
@@ -85,10 +85,10 @@ racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../gen
 
 #polished smartdenovo assembly using nextpolish with Illumina short reads
 mkdir ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out && cd ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out
-ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz .
-ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
+ln -s /xxx/raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz .
+ln -s /xxx/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
 ln -s ../Are-1.smartdenovo.racon_round3.fasta input.genome.fa
-cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
+cat /xxx/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
 bash ./run_nextpolish 
 
 #purge smartdenovo assembly
@@ -138,7 +138,7 @@ hist_plot.py -X 250 -c ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/p
 #scaffolding
 cd ../genome_assembly/AtAre1/04quickmerge_out00 
 ln -s ./purge_dups/Are-1.smartdenovo_flye_merge.purged.fa . 
-ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.fasta . 
+ln -s /xxx/ref_genome/t2t-col.20210610.fasta . 
 mv ./ragoo_output ./ragoo_output_tair10 
 ragoo.py -t 20 -R ../../../genome_assembly/AtAre1/01Canu_out/Nanopore_Are-1.trim.flt.correctedReads.fasta.gz -T corr -C ./Are-1.smartdenovo_flye_merge.purged.fa ./t2t-col.20210610.fasta > run_ragoo.t2t.logs 2>&1 
 mv ./ragoo_output ./ragoo_output_t2t 
@@ -151,7 +151,7 @@ make_agp.py orderings.fofn ./ctg_alignments/Are-1.smartdenovo_flye_merge.purged.
 ######
 #gapclosing
 cd ../genome_assembly/AtAre1/04quickmerge_out00/ragoo_output_t2t_corr_gapclosing 
-cp /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/AtAre1/01Canu_out/Nanopore_Are-1.trim.flt.correctedReads.fasta.gz . 
+cp /xxx/genome_assembly/AtAre1/01Canu_out/Nanopore_Are-1.trim.flt.correctedReads.fasta.gz . 
 gunzip Nanopore_Are-1.trim.flt.correctedReads.fasta.gz 
 ln -sf ../ragoo_output_t2t_corr/Are-1.ragoo.fasta . 
 cd gap_closing_reads 
@@ -174,11 +174,11 @@ ln -sf ./gap_closing_smartdenovo_flye/Are-1.ragoo.gapclosing_reads_smartdenovo_f
 ######
 #polish using nextpolish
 mkdir ../genome_assembly/AtAre1/04quickmerge_out00/ragoo_output_t2t_corr_gapclosing/nextpolish_out && cd ../genome_assembly/AtAre1/04quickmerge_out00/ragoo_output_t2t_corr_gapclosing/nextpolish_out 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_allData/Illumina_Are-1_R1.fastq.gz . 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_allData/Illumina_Are-1_R2.fastq.gz . 
+ln -sf /xxx/raw_data/Illumina_allData/Illumina_Are-1_R1.fastq.gz . 
+ln -sf /xxx/raw_data/Illumina_allData/Illumina_Are-1_R2.fastq.gz . 
 ragtag.py splitasm ../Are-1.ragoo.gapclosing.fasta -o ../Are-1.ragoo.gapclosing.ragtag.splitasm.agp > ../Are-1.ragoo.gapclosing.ragtag.splitasm.fasta 
 ln -sf ../Are-1.ragoo.gapclosing.ragtag.splitasm.fasta input.genome.fa 
-cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish 
+cat /xxx/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish 
 bash ./run_nextpolish > run_nextpolish.log 2>&1 
 cat ./genome.nextpolish.fa | sed 's/_np1212.*//g' > ./genome.nextpolish.rename.fa 
 ragtag.py agp2fa ../Are-1.ragoo.gapclosing.ragtag.splitasm.agp ./genome.nextpolish.rename.fa > ./Are-1.ragoo.gapclosing.polished.fasta
@@ -305,8 +305,8 @@ hist_plot.py -X 200 -c ../genome_assembly/Db-1/04quickmerge_out000/purge_dups2/c
 ######
 #scaffolding
 cd ../genome_assembly/Db-1/04quickmerge_out000 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.fasta . 
-ragoo.py -t 20 -R /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/batch1/5129_A.hifi_reads.fastq.gz -T corr -C ./Db-1.canu_flye_hifiasm.merged.fasta ./t2t-col.20210610.fasta 
+ln -sf /xxx/ref_genome/t2t-col.20210610.fasta . 
+ragoo.py -t 20 -R /xxx/raw_data/batch1/5129_A.hifi_reads.fastq.gz -T corr -C ./Db-1.canu_flye_hifiasm.merged.fasta ./t2t-col.20210610.fasta 
 mv ./ragoo_output ./ragoo_output_t2t 
 cd ./ragoo_output_t2t 
 ls ./orderings/* > orderings.fofn 
@@ -317,7 +317,7 @@ make_agp.py orderings.fofn ./ctg_alignments/Db-1.canu_flye_hifiasm.merged.misasm
 ######
 #gapclosing
 cd ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing 
-cp /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/batch1/5129_A.hifi_reads.fastq.gz . 
+cp /xxx/raw_data/batch1/5129_A.hifi_reads.fastq.gz . 
 gunzip 5129_A.hifi_reads.fastq.gz 
 ln -sf ../ragoo_output_t2t_corr/Db-1.ragoo.fasta . 
 cd gap_closing_reads 
