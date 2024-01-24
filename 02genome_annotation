@@ -2,6 +2,7 @@
 ##########################################################################################################################################################################################################################################################################################################################################
 
 ######
+#
 cat ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/genome.nextpolish.fa | awk '{print $1}' > ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Mt_Ct_LASTZ_out/Are-1.flye_ass_polished.fa 
 grep ">" ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/genome.nextpolish.fa | sed -e "s/>//g" -e "s/ /\t/g" > ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Mt_Ct_LASTZ_out/Are-1.flye_ass_polished.len 
 cut -f1 ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Mt_Ct_LASTZ_out/Are-1.flye_ass_polished.len > ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Mt_Ct_LASTZ_out/Are-1.flye_ass_polished.contig_list 
@@ -53,9 +54,10 @@ while read ctg; do echo "lastz chr${ctg}.fa /netscratch/dep_mercier/grp_mercier/
 
 ######
 vim ../ref_genome/telomeric_repeat_motif.fa
+>telo_repeat
 CCCTAAA
 vim ../ref_genome/centromeric_repeat_motif.fa
->CEN180
+>centro_repeat
 AGTATAAGAACTTAAACCGCAACCCGATCTTAAAAGCCTAAGTAGTGTTTCCTTGTTAGA
 AGACACAAAGCCAAAGACTCATATGGACTTTGGCTACACCATGAAAGCTTTGAGAAGCAA
 GAAGAAGGTTGGTTAGTGTTTTGGAGTCGAATATGACTTGATGTCATGTGTATGATTG
