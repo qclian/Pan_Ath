@@ -171,6 +171,19 @@ cd ..
 ln -sf ./gap_closing_smartdenovo_flye/Are-1.ragoo.gapclosing_reads_smartdenovo_flye.fasta Are-1.ragoo.gapclosing.fasta
 
 
+######
+#polish using nextpolish
+mkdir ../genome_assembly/AtAre1/04quickmerge_out00/ragoo_output_t2t_corr_gapclosing/nextpolish_out && cd ../genome_assembly/AtAre1/04quickmerge_out00/ragoo_output_t2t_corr_gapclosing/nextpolish_out 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_allData/Illumina_Are-1_R1.fastq.gz . 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_allData/Illumina_Are-1_R2.fastq.gz . 
+ragtag.py splitasm ../Are-1.ragoo.gapclosing.fasta -o ../Are-1.ragoo.gapclosing.ragtag.splitasm.agp > ../Are-1.ragoo.gapclosing.ragtag.splitasm.fasta 
+ln -sf ../Are-1.ragoo.gapclosing.ragtag.splitasm.fasta input.genome.fa 
+cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish 
+bash ./run_nextpolish > run_nextpolish.log 2>&1 
+cat ./genome.nextpolish.fa | sed 's/_np1212.*//g' > ./genome.nextpolish.rename.fa 
+ragtag.py agp2fa ../Are-1.ragoo.gapclosing.ragtag.splitasm.agp ./genome.nextpolish.rename.fa > ./Are-1.ragoo.gapclosing.polished.fasta
+
+
 
 
 ##########################################################################################################################################################################################################################################################################################################################################
