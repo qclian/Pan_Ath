@@ -33,6 +33,7 @@ cd ../genome_assembly/Db-1/07Gene_anno/06SNAP_out
 ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 snap /netscratch/dep_mercier/grp_mercier/software/software_installpackages/snap/HMM/A.thaliana.hmm genome.fa -gff > Db-1.snap.gff
 
+
 #RNA-seq, Trinity + TransDecoder + CD-HIT, and then send to Exonerate
 /opt/share/software/packages/trinityrnaseq-2.14.0/bin/Trinity --seqType fq --max_memory 50G --CPU 8 --left ../raw_data/RNA_publicData/ERR1588809_1.trim.paired.fastq.gz,../raw_data/RNA_publicData/ERR1588810_1.trim.paired.fastq.gz --right ../raw_data/RNA_publicData/ERR1588809_2.trim.paired.fastq.gz,../raw_data/RNA_publicData/ERR1588810_2.trim.paired.fastq.gz --output ../transcriptome_assembly/Can-0_pe_trinity/ --full_cleanup --no_version_check > ../transcriptome_assembly/Can-0_pe_trinity/nohup.trinity.logs 2>&1 
 /opt/share/software/packages/trinityrnaseq-2.14.0/bin/Trinity --seqType fq --max_memory 50G --CPU 8 --single ../raw_data/RNA_publicData/SRR1046859.trim.fastq.gz,../raw_data/RNA_publicData/SRR1046860.trim.fastq.gz,../raw_data/RNA_publicData/SRR1046861.trim.fastq.gz --output ../transcriptome_assembly/Kn-0_se_trinity/ --full_cleanup --no_version_check > ../transcriptome_assembly/Kn-0_se_trinity/nohup.trinity.logs 2>&1 
@@ -40,6 +41,60 @@ snap /netscratch/dep_mercier/grp_mercier/software/software_installpackages/snap/
 TransDecoder.LongOrfs -t ../transcriptome_assembly/Bay0_se_trinity.Trinity.fasta --output_dir ../transcriptome_assembly/Bay0_se_transdecoder
 /opt/share/software/packages/diamond-v2.0.4/bin/diamond blastp -q ../transcriptome_assembly/Bay0_se_transdecoder/longest_orfs.pep -d /netscratch/dep_mercier/grp_mercier/Databases/UniProt_2022/uniprot_sprot.fasta -k 1 -f 6 -e 1e-5 --ultra-sensitive -p 4 -o ../transcriptome_assembly/Bay0_se_transdecoder/blastp.outfmt6 
 TransDecoder.Predict -t ../transcriptome_assembly/Bay0_se_trinity.Trinity.fasta --retain_pfam_hits ../transcriptome_assembly/Bay0_se_transdecoder/pfam.domtblout --retain_blastp_hits ../transcriptome_assembly/Bay0_se_transdecoder/blastp.outfmt6 --output_dir ../transcriptome_assembly/Bay0_se_transdecoder
+
+mkdir ../pan_genome/panPep_lib
+cat ../AMPRILS/*protein-coding.genes.v2.5.protein.fasta ../transcriptome_assembly/*_transdecoder/*_trinity.Trinity.fasta.transdecoder.pep > ../pan_genome/panPep_lib/PEPlib.list.panPEP.fa
+nohup /opt/share/software/packages/cdhit-4.6.8/bin/cd-hit -i ../pan_genome/panPep_lib/PEPlib.list.panPEP.fa -o ../pan_genome/panPep_lib/PEPlib.list.panPEP.c98.fa -c 0.98 -M 80000 -T 48 > ./logs/nohup.run_panPEP.cdhit.logs 2>&1 &
+
+
+#Exonerate
+cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/Athaliana_447_Araport11.protein.fa .
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./Athaliana_447_Araport11.protein.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.Ath.chunk-"i".gff "}}' > ./run_exonerate_ath 
+pthreadrun ./run_exonerate_ath 1 10 > ./nohup.run_exonerate_ath.log 2>&1 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.Ath.chunk-"i".gff prot > ./Db-1.Ath.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_ath 
+pthreadrun ./run_exonerate_gff_to_alignment_gff3_ath 1 10 > ./nohup.run_exonerate_gff_to_alignment_gff3_ath.log 2>&1 
+cat ./Db-1.Ath.chunk-*.gff3 | bedtools sort -i - > ./Db-1.Ath.exonerate.gff3
+
+cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/Alyrata_384_v2.1.protein.fa .
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./Alyrata_384_v2.1.protein.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.Aly.chunk-"i".gff "}}' > ./run_exonerate_aly 
+pthreadrun ./run_exonerate_aly 1 10 > ./nohup.run_exonerate_aly.log 2>&1 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.Aly.chunk-"i".gff prot > ./Db-1.Aly.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_aly 
+pthreadrun ./run_exonerate_gff_to_alignment_gff3_aly 1 10 > ./nohup.run_exonerate_gff_to_alignment_gff3_aly.log 2>&1 
+cat ./Db-1.Aly.chunk-*.gff3 | bedtools sort -i - > ./Db-1.Aly.exonerate.gff3
+
+cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/Osativa_323_v7.0.protein.fa .
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./Osativa_323_v7.0.protein.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.Osa.chunk-"i".gff "}}' > ./run_exonerate_osa 
+pthreadrun ./run_exonerate_osa 1 10 > ./nohup.run_exonerate_osa.log 2>&1 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.Osa.chunk-"i".gff prot > ./Db-1.Osa.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_osa 
+pthreadrun ./run_exonerate_gff_to_alignment_gff3_osa 1 10 > ./nohup.run_exonerate_gff_to_alignment_gff3_osa.log 2>&1 
+cat ./Db-1.Osa.chunk-*.gff3 | bedtools sort -i - > ./Db-1.Osa.exonerate.gff3
+
+cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/Slycopersicum_514_ITAG3.2.protein.fa .
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./Slycopersicum_514_ITAG3.2.protein.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.Sly.chunk-"i".gff "}}' > ./run_exonerate_sly 
+pthreadrun ./run_exonerate_sly 1 10 > ./nohup.run_exonerate_sly.log 2>&1 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.Sly.chunk-"i".gff prot > ./Db-1.Sly.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_sly 
+pthreadrun ./run_exonerate_gff_to_alignment_gff3_sly 1 10 > ./nohup.run_exonerate_gff_to_alignment_gff3_sly.log 2>&1 
+cat ./Db-1.Sly.chunk-*.gff3 | bedtools sort -i - > ./Db-1.Sly.exonerate.gff3
+
+cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/pan_genome/panPep_lib/PEPlib.list.panPEP.c98.fa .
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./PEPlib.list.panPEP.c98.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.panPEP.chunk-"i".gff "}}' > ./run_exonerate_panPEP 
+pthreadrun ./run_exonerate_sly 1 10 > ./nohup.run_exonerate_sly.log 2>&1 
+
+cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
+echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.panPEP.chunk-"i".gff prot > ./Db-1.panPEP.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_panPEP 
+pthreadrun ./run_exonerate_gff_to_alignment_gff3_panPEP 1 10 > ./nohup.run_exonerate_gff_to_alignment_gff3_panPEP.log 2>&1 
+cat ./Db-1.panPEP.chunk-*.gff3 | bedtools sort -i - > ./Db-1.panPEP.exonerate.gff3
+
 
 
 
