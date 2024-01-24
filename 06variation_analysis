@@ -7,9 +7,11 @@
 bedtools maskfasta -fi ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta -bed ../genome_evaluation/Col-PEK/00Bowtie2_out/centromeric_repeat_motif.col_PEK.srt.min_max.bed -fo ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.cen_masked.fasta &
 trf ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.cen_masked.fasta 2 7 7 80 10 10 20 -f -d -m & 
 
+
 #BWA-mem (Illumina)
 bwa index ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta
 bwa mem ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta ../raw_data/Illumina_allData/Illumina_Db-1_R1.fastq.gz ../raw_data/Illumina_allData/Illumina_Db-1_R2.fastq.gz -t 4 | samtools view -@ 4 -h -b | samtools sort -@ 4 -o ../alignment_ref/Db-1/10bwa_out/Db-1.col_pek.srt.bam 
+
 
 #inGAP-family
 java -mx10g -jar ~/Projects_qclian/Software/inGAP-family-1.0.0/inGAP-family.jar SVP -r ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta -s ../alignment_ref/Db-1/10bwa_out/Db-1.col_pek.srt.rmdup.sam -HSR1 0.5 -o ../alignment_ref/Db-1/14ingap_out/Db-1.col_pek.ingap_r02r15.sv 
@@ -23,6 +25,26 @@ cat ../raw_data/samples.HiFi_Nano.list | awk '{print "java -mx35g -jar /xxx/inGA
 cat ../raw_data/samples.HiFi_Nano.list | awk 'BEGIN{ORS=""; print "java -mx500g -jar /xxx/inGAP-family-1.0.0/inGAP-family.jar MRG -l "}{print "../alignment_ref/"$2"/10bwa_out/72accs.col_pek.ingap.flt.pre_mrg."$3".geno.vcf,"}END{print " -o ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.vcf \n"}' | while read r; do "${r}"; done
 
 cat ../raw_data/samples.HiFi_Nano.list | awk 'BEGIN{ORS=""; print "java -mx920g -jar /xxx/inGAP-family-1.0.0/inGAP-family.jar MRG -l "}{print "../alignment_ref/"$2"/10bwa_out/72accs.col_pek.ingap.flt.pre_mrg."$3".geno.vcf,"}END{print " -o ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.vcf \n"}' | while read r; do "${r}"; done
+
+
+#vcftools
+vcftools --gzvcf ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.vcf.gz --maf 0.05 --max-missing 0.2 --min-alleles 2 --max-alleles 2 --min-meanDP 6 --max-meanDP 226 --remove-indels --recode --recode-INFO-all --out ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.snp 
+
+
+#bedtools
+cat ../genome_evaluation/Col-PEK/00Bowtie2_out/centromeric_repeat_motif.col_PEK.srt.min_max.bed ../genome_assembly/Col-PEK/06TE_anno_pan/genome.fa.mod.EDTA.TEanno.bed | bedtools sort -i - | bedtools intersect -a ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.snp.recode.vcf -b - -v -header > ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf &
+
+
+
+
+######
+
+#syri
+minimap2 -ax asm5 -t 4 --eqx ../ref_genome/Col-PEK1.5-Chr1-5_20220523.fasta ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish_corr/ragoo.noMC.fasta | samtools sort -O BAM - > ../alignment_ref/Db-1/30syri_out/Col-PEK_Db-1.corr.bam && samtools index ../alignment_ref/Db-1/30syri_out/Col-PEK_Db-1.corr.bam
+
+syri -c ../alignment_ref/Db-1/30syri_out/Col-PEK_Db-1.corr.bam -r ../ref_genome/Col-PEK1.5-Chr1-5_20220523.fasta -q ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish_corr/ragoo.noMC.fasta -F B --dir ../alignment_ref/Db-1/30syri_out/ --prefix Col-PEK_Db-1.corr. 
+
+
 
 
 
