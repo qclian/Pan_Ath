@@ -28,6 +28,22 @@ find ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosin
 gff3_merge -o ../genome_assembly/Db-1/07Gene_anno/04GlimmerHMM_out/Db-1.glimmerhmm.gff ../genome_assembly/Db-1/07Gene_anno/04GlimmerHMM_out/Db-1.*fasta.gff 
 glimmerHMM_to_GFF3.pl ../genome_assembly/Db-1/07Gene_anno/04GlimmerHMM_out/Db-1.glimmerhmm.gff > ../genome_assembly/Db-1/07Gene_anno/04GlimmerHMM_out/Db-1.glimmerhmm.gff3
 
+#SNAP
+cd ../genome_assembly/Db-1/07Gene_anno/06SNAP_out 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+snap /netscratch/dep_mercier/grp_mercier/software/software_installpackages/snap/HMM/A.thaliana.hmm genome.fa -gff > Db-1.snap.gff
+
+#RNA-seq, Trinity + TransDecoder + CD-HIT, and then send to Exonerate
+/opt/share/software/packages/trinityrnaseq-2.14.0/bin/Trinity --seqType fq --max_memory 50G --CPU 8 --left ../raw_data/RNA_publicData/ERR1588809_1.trim.paired.fastq.gz,../raw_data/RNA_publicData/ERR1588810_1.trim.paired.fastq.gz --right ../raw_data/RNA_publicData/ERR1588809_2.trim.paired.fastq.gz,../raw_data/RNA_publicData/ERR1588810_2.trim.paired.fastq.gz --output ../transcriptome_assembly/Can-0_pe_trinity/ --full_cleanup --no_version_check > ../transcriptome_assembly/Can-0_pe_trinity/nohup.trinity.logs 2>&1 
+/opt/share/software/packages/trinityrnaseq-2.14.0/bin/Trinity --seqType fq --max_memory 50G --CPU 8 --single ../raw_data/RNA_publicData/SRR1046859.trim.fastq.gz,../raw_data/RNA_publicData/SRR1046860.trim.fastq.gz,../raw_data/RNA_publicData/SRR1046861.trim.fastq.gz --output ../transcriptome_assembly/Kn-0_se_trinity/ --full_cleanup --no_version_check > ../transcriptome_assembly/Kn-0_se_trinity/nohup.trinity.logs 2>&1 
+
+TransDecoder.LongOrfs -t ../transcriptome_assembly/Bay0_se_trinity.Trinity.fasta --output_dir ../transcriptome_assembly/Bay0_se_transdecoder
+/opt/share/software/packages/diamond-v2.0.4/bin/diamond blastp -q ../transcriptome_assembly/Bay0_se_transdecoder/longest_orfs.pep -d /netscratch/dep_mercier/grp_mercier/Databases/UniProt_2022/uniprot_sprot.fasta -k 1 -f 6 -e 1e-5 --ultra-sensitive -p 4 -o ../transcriptome_assembly/Bay0_se_transdecoder/blastp.outfmt6 
+TransDecoder.Predict -t ../transcriptome_assembly/Bay0_se_trinity.Trinity.fasta --retain_pfam_hits ../transcriptome_assembly/Bay0_se_transdecoder/pfam.domtblout --retain_blastp_hits ../transcriptome_assembly/Bay0_se_transdecoder/blastp.outfmt6 --output_dir ../transcriptome_assembly/Bay0_se_transdecoder
+
+
+
+
 
 
 
