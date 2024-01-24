@@ -53,7 +53,7 @@ while read ctg; do echo "lastz chr${ctg}.fa /netscratch/dep_mercier/grp_mercier/
 
 ##########################################################################################################################################################################################################################################################################################################################################
 ##########################################################################################################################################################################################################################################################################################################################################
-#Annoate telomeric and centromeric repeats for Oxford Nanopore accessions, use Are-1 as an example
+#Annoate telomeric and centromeric repeats 
 
 ######
 vim ../ref_genome/telomeric_repeat_motif.fa
@@ -66,10 +66,9 @@ AGACACAAAGCCAAAGACTCATATGGACTTTGGCTACACCATGAAAGCTTTGAGAAGCAA
 GAAGAAGGTTGGTTAGTGTTTTGGAGTCGAATATGACTTGATGTCATGTGTATGATTG
 
 ######
-bowtie2-build --threads 2 ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/Are-1.smartdenovo_flye_merge.purged.fa ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/Are-1.smartdenovo_flye_merge.purged.fa 
-bowtie2 -f -a --very-sensitive -p 2 -x ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/Are-1.smartdenovo_flye_merge.purged.fa -U ../ref_genome/telomeric_repeat_motif.fa -S ../genome_evaluation/AtAre1/00Bowtie2_out/telomeric_repeat_motif.Are-1.purged.sam && samtools view -bS ../genome_evaluation/AtAre1/00Bowtie2_out/telomeric_repeat_motif.Are-1.purged.sam | samtools sort | samtools view -h > ../genome_evaluation/AtAre1/00Bowtie2_out/telomeric_repeat_motif.Are-1.purged.srt.sam
-bowtie2 -f -a --very-sensitive -p 2 -x ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/Are-1.smartdenovo_flye_merge.purged.fa -U ../ref_genome/centromeric_repeat_motif.fa -S ../genome_evaluation/AtAre1/00Bowtie2_out/centromeric_repeat_motif.Are-1.purged.sam && samtools view -bS ../genome_evaluation/AtAre1/00Bowtie2_out/centromeric_repeat_motif.Are-1.purged.sam | samtools sort | samtools view -h > ../genome_evaluation/AtAre1/00Bowtie2_out/centromeric_repeat_motif.Are-1.purged.srt.sam
-
+bowtie2-build --threads 4 ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta
+bowtie2 -f -a --very-sensitive -p 4 -x ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta -U ../ref_genome/telomeric_repeat_motif.fa -S ../genome_evaluation/Db-1/00Bowtie2_out/telomeric_repeat_motif.Db-1.corr.t2t.gapclosing.polished.sam && samtools view -bS ../genome_evaluation/Db-1/00Bowtie2_out/telomeric_repeat_motif.Db-1.corr.t2t.gapclosing.polished.sam | samtools sort | samtools view -h > ../genome_evaluation/Db-1/00Bowtie2_out/telomeric_repeat_motif.Db-1.corr.t2t.gapclosing.polished.srt.sam
+bowtie2 -f -a --very-sensitive -p 4 -x ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta -U ../ref_genome/centromeric_repeat_motif.fa -S ../genome_evaluation/Db-1/00Bowtie2_out/centromeric_repeat_motif.Db-1.corr.t2t.gapclosing.polished.sam && samtools view -bS ../genome_evaluation/Db-1/00Bowtie2_out/centromeric_repeat_motif.Db-1.corr.t2t.gapclosing.polished.sam | samtools sort | samtools view -h > ../genome_evaluation/Db-1/00Bowtie2_out/centromeric_repeat_motif.Db-1.corr.t2t.gapclosing.polished.srt.sam
 
 
 
