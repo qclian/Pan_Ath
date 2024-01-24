@@ -12,9 +12,9 @@ for i in {2..8}; do echo "admixture --cv ../alignment_ref/72merged_snps/72accs.c
 
 
 #PopLDdecay
-PopLDdecay -InVCF ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz -OutStat ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay > ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay.log 2>&1 &
+PopLDdecay -InVCF ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz -OutStat ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay 
 
-for k in {k1,k2,k3,k4}; do echo "PopLDdecay -InVCF ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz -OutStat ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay.${k} -SubPop ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.plink.pca.4.Q.grp.${k} > ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay.${k}.log 2>&1 &" | bash; done
+for k in {k1,k2,k3,k4}; do echo "PopLDdecay -InVCF ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz -OutStat ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay.${k} -SubPop ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.plink.pca.4.Q.grp.${k} &" | bash; done
 
 
 
