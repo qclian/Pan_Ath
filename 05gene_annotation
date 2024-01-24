@@ -88,9 +88,7 @@ cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/
 ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/pan_genome/panPep_lib/PEPlib.list.panPEP.c98.fa .
 ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./PEPlib.list.panPEP.c98.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.panPEP.chunk-"i".gff "}}' > ./run_exonerate_panPEP 
-pthreadrun ./run_exonerate_sly 1 10 > ./nohup.run_exonerate_sly.log 2>&1 
-
-cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
+pthreadrun ./run_exonerate_panPEP 1 10 > ./nohup.run_exonerate_panPEP.log 2>&1 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.panPEP.chunk-"i".gff prot > ./Db-1.panPEP.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_panPEP 
 pthreadrun ./run_exonerate_gff_to_alignment_gff3_panPEP 1 10 > ./nohup.run_exonerate_gff_to_alignment_gff3_panPEP.log 2>&1 
 cat ./Db-1.panPEP.chunk-*.gff3 | bedtools sort -i - > ./Db-1.panPEP.exonerate.gff3
