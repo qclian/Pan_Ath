@@ -1,8 +1,10 @@
 
 ##########################################################################################################################################################################################################################################################################################################################################
 ##########################################################################################################################################################################################################################################################################################################################################
+#Oxford Nanopore accessions, use Are-1 as an example
 
 ######
+#Estimate genome size using Illumina short reads dataset
 bwa mem ../ref_genome/chloro_mito_phiX.fasta ../raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz ../raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz -t 20 > ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe.sam
 samtools view -@ 8 -bS ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe.sam | samtools sort -@ 20 - -o ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bam
 samtools view -@ 20 -b -f 77 ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bam > ../genome_assembly/AtAre1/00Kmer_est/Are-1_aln_pe_sorted.bothunmapped1.bam
@@ -19,14 +21,19 @@ rm ../genome_assembly/AtAre1/00Kmer_est/*sam
 
 Rscript ./run_findGSE ../genome_assembly/AtAre1/00Kmer_est/Are-1.Illumina.jf.histo ../genome_assembly/AtAre1/00Kmer_est/Are-1.Illumina.ndna.findGSE
 
+
 ######
+#Quality control of Nanopore long reads
 mkdir ../genome_assembly/AtAre1/01Nano_QC
 porechop -i ../raw_data/Nanopore_rawData/Nanopore_Are-1.fastq.gz -o ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.fastq.gz 
 filtlong --min_length 1000 --min_mean_q 70 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.fastq.gz | gzip > ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz
 
+
 ######
+#assembly using flye
 /opt/share/software/packages/Flye-2.7/bin/flye -o ../genome_assembly/AtAre1/02Flye_out00 -t 24 -g 135m --nano-raw ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz 
 
+#polished flye assembly using racon with Nanopore long reads
 mkdir ../genome_assembly/AtAre1/02Flye_out00/racon_out
 minimap2 -t 24 ../genome_assembly/AtAre1/02Flye_out00/assembly.fasta ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_1.paf
 racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_1.paf ../genome_assembly/AtAre1/02Flye_out00/assembly.fasta > ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round1.fasta
@@ -35,6 +42,7 @@ racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../gen
 minimap2 -t 24 ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round2.fasta ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_3.paf
 racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/02Flye_out00/racon_out/round_3.paf ../genome_assembly/AtAre1/02Flye_out00/racon_out/racon_round2.fasta > ../genome_assembly/AtAre1/02Flye_out00/racon_out/assembly.racon_round3.fasta
 
+#polished flye assembly using nextpolish with Illumina short reads
 mkdir ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out && cd ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out
 ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz .
 ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
@@ -42,6 +50,7 @@ ln -s ../assembly.racon_round3.fasta input.genome.fa
 cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
 bash ./run_nextpolish 
 
+#purge flye assembly
 minimap2 -x map-ont -t 20 ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/genome.nextpolish.fa ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz -o ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/AtAre1.flye_ass_polished.nano.paf 
 
 mkdir ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups 
@@ -62,8 +71,10 @@ hist_plot.py -c ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/
 
 
 ######
+#assembly using SMARTdenovo
 smartdenovo.pl -c 1 -t 20 -J 1000 -k 16 -p ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.mak
 
+#polished smartdenovo assembly using racon with Nanopore long reads
 ln ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.dmo.cns ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.dmo.cns.fa 
 mkdir ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out
 minimap2 -t 24 ../genome_assembly/AtAre1/03SMARTdenovo_out/Are-1.smartdenovo.dmo.cns.fa ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_1.paf
@@ -73,6 +84,7 @@ racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../gen
 minimap2 -t 24 ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/racon_round2.fasta ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_3.paf
 racon -t 24 ../raw_data/Nanopore_rawData/Nanopore_Are-1.trim.flt.fastq.gz ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/round_3.paf ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/racon_round2.fasta > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/Are-1.smartdenovo.racon_round3.fasta
 
+#polished smartdenovo assembly using nextpolish with Illumina short reads
 mkdir ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out && cd ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out
 ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R1.fastq.gz .
 ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/raw_data/Illumina_rawData/Illumina_Are-1_R2.fastq.gz .
@@ -80,6 +92,7 @@ ln -s ../Are-1.smartdenovo.racon_round3.fasta input.genome.fa
 cat /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/run_nextpolish | sed -e "s/reads_R1/Illumina_Are-1_R1/g" -e "s/reads_R2/Illumina_Are-1_R2/g" > run_nextpolish
 bash ./run_nextpolish 
 
+#purge smartdenovo assembly
 mkdir ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups 
 pbcstat -O ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/AtAre1.smartdenovo_ass_polished.nano.paf 
 calcuts ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/PB.stat > ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/cutoffs.auto 
@@ -97,13 +110,14 @@ calcuts ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/pur
 hist_plot.py -c ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups/cutoffs.auto ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups/PB.stat ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/purge_dups/PB.stat.auto.png
 
 
-
 ######
+#merge flye and smartdenovo assemblies using quickmerge
 nucmer -t 10 -p ../genome_assembly/AtAre1/05quickmerge_out/Are-1.smartdenovo_flye.aln ../genome_assembly/AtAre1/03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.fa ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.fa
 delta-filter -r -q -l 10000 -i 0.9 ../genome_assembly/AtAre1/05quickmerge_out/Are-1.smartdenovo_flye.aln.delta > ../genome_assembly/AtAre1/05quickmerge_out/Are-1.smartdenovo_flye.aln.flt.delta 
 cd ../genome_assembly/AtAre1/05quickmerge_out 
 quickmerge -d Are-1.smartdenovo_flye.aln.flt.delta -q ../02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.fa -r ../03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.fa -hco 5.0 -c 1.5 -l 14172502 -ml 5000 -p Are-1.smartdenovo_flye.merge
 
+#purge merged assembly
 mkdir ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups 
 pbcstat -O ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups ../genome_assembly/AtAre1/04quickmerge_out00/Are-1.smartdenovo_flye_merge.nano.paf 
 calcuts ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/PB.stat > ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/cutoffs.auto 
@@ -122,6 +136,7 @@ hist_plot.py -X 250 -c ../genome_assembly/AtAre1/04quickmerge_out00/purge_dups/p
 
 
 ######
+#scaffolding
 cd ../genome_assembly/AtAre1/04quickmerge_out00 
 ln -s ./purge_dups/Are-1.smartdenovo_flye_merge.purged.fa . 
 ln -s /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.fasta . 
