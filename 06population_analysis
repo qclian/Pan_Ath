@@ -1,1 +1,24 @@
+##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
+
+######
+#PLINK, PCA
+plink --vcf ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz --double-id --set-missing-var-ids @:# --indep-pairwise 50 10 0.1 --out ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.plink 
+plink --vcf ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz --double-id --set-missing-var-ids @:# --extract ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.plink.prune.in --make-bed --pca --out ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.plink.pca 
+
+
+#ADMIXTURE
+for i in {2..8}; do echo "admixture --cv ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.plink.pca.bed $i > ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.plink.admixture.k${i}.out &" | bash; done
+
+
+#PopLDdecay
+PopLDdecay -InVCF ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz -OutStat ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay > ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay.log 2>&1 &
+
+for k in {k1,k2,k3,k4}; do echo "PopLDdecay -InVCF ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz -OutStat ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay.${k} -SubPop ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.plink.pca.4.Q.grp.${k} > ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.LDdecay.${k}.log 2>&1 &" | bash; done
+
+
+
+
+##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
 
