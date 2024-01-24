@@ -1,1 +1,29 @@
+##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
 
+######
+#Ortholog-based tree
+join_alignments.py -a ../pan_genome/orthofinder_results_noMC_corr/OrthoFinder/Results/Single_Copy_Orthologue_Sequences_aln_cds/* -d "-" -P -u ../pan_genome/infer_species_tree_corr/species73.noMC.single_copy_orthologue.cds.aln.supermatrix.fasta 
+
+cd ../pan_genome/infer_species_tree_corr/
+iqtree -spp species73.noMC.single_copy_orthologue.cds.aln.supermatrix.fasta.partition.txt -s species73.noMC.single_copy_orthologue.cds.aln.supermatrix.fasta -m MFP -bb 1000 -alrt 1000 -nt 100 -pre species73.noMC.single_copy_orthologue.cds.aln.supermatrix.iqtree -redo -safe
+
+
+#SNP-based tree
+python /xxx/vcf2phylip-2.8/vcf2phylip.py -i ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.vcf.gz --output-folder ../alignment_ref/72merged_snps/ --output-prefix 72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp --outgroup Ath --resolve-IUPAC --fasta 
+
+iqtree -s ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.min4.fasta -m GTR+ASC -bb 1000 -alrt 1000 -nt 24 -pre ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.iqtree -safe 
+iqtree -s ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.iqtree.varsites.phy -m GTR+ASC -bb 1000 -alrt 1000 -nt 20 -redo -pre ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.refine.maf005.maxmiss02.biale.mindp6.maxdp226.flt_cen.flt_te.snp.varsites.iqtree -safe 
+
+
+#SV-based tree
+cd /xxx/alignment_ref/72merged_svs/
+iqtree -s ./72accs.col_pek.corr.syri.sv.g2_g3.mrg.phy -st MORPH -m MK+ASC -bb 1000 -alrt 1000 -nt 48 -pre ./72accs.col_pek.corr.syri.sv.g2_g3.mrg.iqtree -safe -redo 
+iqtree -s ./72accs.col_pek.corr.syri.sv.g2_g3.mrg.iqtree.varsites.phy -st MORPH -m MK+ASC -bb 1000 -alrt 1000 -nt 48 -pre ./72accs.col_pek.corr.syri.sv.g2_g3.mrg.varsites.iqtree -safe -redo 
+
+
+
+
+
+##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
