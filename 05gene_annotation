@@ -17,7 +17,7 @@ find ../01RepeatMask_out/genome.fa.mod.MAKER.masked.split/ -type f -name "*.mask
 augustus_GFF3_to_EVM_GFF3.pl ./Db-1.temp.gff > ./Db-1.augustus.gff3
 
 #GeneMark
-cd /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/07Gene_anno/03GeneMark_out 
+cd /xxx/genome_assembly/Db-1/07Gene_anno/03GeneMark_out 
 gmes_petap.pl --ES --sequence ../../04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta --cores 5 > ./nohup.run_gmes.log 
 gtf2gff3.pl ./genemark.gtf | bedtools sort -i - > ./Db-1.genemark.gff3
 
@@ -30,7 +30,7 @@ glimmerHMM_to_GFF3.pl ../genome_assembly/Db-1/07Gene_anno/04GlimmerHMM_out/Db-1.
 
 #SNAP
 cd ../genome_assembly/Db-1/07Gene_anno/06SNAP_out 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+ln -sf /xxx/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 snap /netscratch/dep_mercier/grp_mercier/software/software_installpackages/snap/HMM/A.thaliana.hmm genome.fa -gff > Db-1.snap.gff
 
 
@@ -49,8 +49,8 @@ nohup /opt/share/software/packages/cdhit-4.6.8/bin/cd-hit -i ../pan_genome/panPe
 
 #Exonerate
 cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/Athaliana_447_Araport11.protein.fa .
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+ln -sf /xxx/ref_genome/Athaliana_447_Araport11.protein.fa .
+ln -sf /xxx/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./Athaliana_447_Araport11.protein.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.Ath.chunk-"i".gff "}}' > ./run_exonerate_ath 
 ./run_exonerate_ath 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.Ath.chunk-"i".gff prot > ./Db-1.Ath.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_ath 
@@ -58,8 +58,8 @@ echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1
 cat ./Db-1.Ath.chunk-*.gff3 | bedtools sort -i - > ./Db-1.Ath.exonerate.gff3
 
 cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/Alyrata_384_v2.1.protein.fa .
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+ln -sf /xxx/ref_genome/Alyrata_384_v2.1.protein.fa .
+ln -sf /xxx/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./Alyrata_384_v2.1.protein.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.Aly.chunk-"i".gff "}}' > ./run_exonerate_aly 
 ./run_exonerate_aly 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.Aly.chunk-"i".gff prot > ./Db-1.Aly.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_aly 
@@ -67,8 +67,8 @@ echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1
 cat ./Db-1.Aly.chunk-*.gff3 | bedtools sort -i - > ./Db-1.Aly.exonerate.gff3
 
 cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/Osativa_323_v7.0.protein.fa .
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+ln -sf /xxx/ref_genome/Osativa_323_v7.0.protein.fa .
+ln -sf /xxx/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./Osativa_323_v7.0.protein.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.Osa.chunk-"i".gff "}}' > ./run_exonerate_osa 
 ./run_exonerate_osa 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.Osa.chunk-"i".gff prot > ./Db-1.Osa.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_osa 
@@ -76,8 +76,8 @@ echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1
 cat ./Db-1.Osa.chunk-*.gff3 | bedtools sort -i - > ./Db-1.Osa.exonerate.gff3
 
 cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/Slycopersicum_514_ITAG3.2.protein.fa .
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+ln -sf /xxx/ref_genome/Slycopersicum_514_ITAG3.2.protein.fa .
+ln -sf /xxx/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./Slycopersicum_514_ITAG3.2.protein.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.Sly.chunk-"i".gff "}}' > ./run_exonerate_sly 
 ./run_exonerate_sly 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.Sly.chunk-"i".gff prot > ./Db-1.Sly.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_sly 
@@ -85,8 +85,8 @@ echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1
 cat ./Db-1.Sly.chunk-*.gff3 | bedtools sort -i - > ./Db-1.Sly.exonerate.gff3
 
 cd ../genome_assembly/Db-1/07Gene_anno/05Exonerate_out/ 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/pan_genome/panPep_lib/PEPlib.list.panPEP.c98.fa .
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+ln -sf /xxx/pan_genome/panPep_lib/PEPlib.list.panPEP.c98.fa .
+ln -sf /xxx/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 echo | awk '{for(i=1;i<=20;i++){print "exonerate -q ./PEPlib.list.panPEP.c98.fa --querychunkid "i" --querychunktotal 20 -t ./genome.fa -m protein2genome --percent 70 --minintron 10 --maxintron 60000 --showvulgar no --showalignment no --showquerygff no --showtargetgff yes --ryo \"AveragePercentIdentity: %pi\\n\" > ./Db-1.panPEP.chunk-"i".gff "}}' > ./run_exonerate_panPEP 
 ./run_exonerate_panPEP
 echo | awk '{for(i=1;i<=20;i++){print "exonerate_gff_to_alignment_gff3.pl ./Db-1.panPEP.chunk-"i".gff prot > ./Db-1.panPEP.chunk-"i".gff3"}}' > ./run_exonerate_gff_to_alignment_gff3_panPEP 
@@ -96,7 +96,7 @@ cat ./Db-1.panPEP.chunk-*.gff3 | bedtools sort -i - > ./Db-1.panPEP.exonerate.gf
 
 #EVidenceModeler
 cd ../genome_assembly/Db-1/07Gene_anno/07EVM_out/ 
-ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
+ln -sf /xxx/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta genome.fa 
 cat ../02Augustus_out/Db-1.augustus.gff3 ../03GeneMark_out/Db-1.genemark.gff3 ../04GlimmerHMM_out/Db-1.glimmerhmm.gff3 ../06SNAP_out/Db-1.snap.gff3 > denovo.gff3 
 cat ../05Exonerate_out/Db-1.Ath.exonerate.gff3 | sed "s/exonerate/exonerate.Ath/g" > exonerate.v2.gff3 
 cat ../05Exonerate_out/Db-1.Aly.exonerate.gff3 | sed "s/exonerate/exonerate.Aly/g" >> exonerate.v2.gff3 
@@ -104,7 +104,7 @@ cat ../05Exonerate_out/Db-1.Sly.exonerate.gff3 | sed "s/exonerate/exonerate.Sly/
 cat ../05Exonerate_out/Db-1.Osa.exonerate.gff3 | sed "s/exonerate/exonerate.Osa/g" >> exonerate.v2.gff3 
 cat ../05Exonerate_out/Db-1.panPEP.exonerate.gff3 | sed "s/exonerate/exonerate.panPEP/g" >> exonerate.v2.gff3 
 partition_EVM_inputs.pl --genome genome.fa --gene_predictions denovo.gff3 --protein_alignments exonerate.v2.gff3 --segmentSize 100000 --overlapSize 10000 --partition_listing partitions_list.out > nohup.partition_EVM_inputs.log 2>&1 
-write_EVM_commands.pl --genome genome.fa --weights /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/run_scripts/evidencemodeler_weights.v2.txt --gene_predictions denovo.gff3 --protein_alignments exonerate.v2.gff3 --output_file_name evm.out.v2 --partitions partitions_list.out > commands.list.v2 
+write_EVM_commands.pl --genome genome.fa --weights /xxx/run_scripts/evidencemodeler_weights.v2.txt --gene_predictions denovo.gff3 --protein_alignments exonerate.v2.gff3 --output_file_name evm.out.v2 --partitions partitions_list.out > commands.list.v2 
 ./commands.list.v2 
 recombine_EVM_partial_outputs.pl --partitions partitions_list.out --output_file_name evm.out.v2 > nohup.recombine_EVM_partial_outputs.v2.log 2>&1 
 convert_EVM_outputs_to_GFF3.pl --partitions partitions_list.out --output evm.out.v2 --genome genome.fa > nohup.convert_EVM_outputs_to_GFF3.v2.log 2>&1 
