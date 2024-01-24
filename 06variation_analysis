@@ -1,0 +1,30 @@
+##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
+
+######
+
+#TandemRepeatFinder
+bedtools maskfasta -fi ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta -bed ../genome_evaluation/Col-PEK/00Bowtie2_out/centromeric_repeat_motif.col_PEK.srt.min_max.bed -fo ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.cen_masked.fasta &
+trf ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.cen_masked.fasta 2 7 7 80 10 10 20 -f -d -m & 
+
+#BWA-mem (Illumina)
+bwa index ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta
+bwa mem ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta ../raw_data/Illumina_allData/Illumina_Db-1_R1.fastq.gz ../raw_data/Illumina_allData/Illumina_Db-1_R2.fastq.gz -t 4 | samtools view -@ 4 -h -b | samtools sort -@ 4 -o ../alignment_ref/Db-1/10bwa_out/Db-1.col_pek.srt.bam 
+
+#inGAP-family
+java -mx10g -jar ~/Projects_qclian/Software/inGAP-family-1.0.0/inGAP-family.jar SVP -r ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta -s ../alignment_ref/Db-1/10bwa_out/Db-1.col_pek.srt.rmdup.sam -HSR1 0.5 -o ../alignment_ref/Db-1/14ingap_out/Db-1.col_pek.ingap_r02r15.sv 
+java -mx10g -jar ~/Projects_qclian/Software/inGAP-family-1.0.0/inGAP-family.jar SNP -r ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.fasta -s ../alignment_ref/Db-1/10bwa_out/Db-1.col_pek.srt.rmdup.sam -t ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.cen_masked.fasta.2.7.7.80.10.10.20.dat -o ../alignment_ref/Db-1/14ingap_out/Db-1.col_pek.ingap.vcf 
+
+mkdir ../alignment_ref/72merged_snps
+cat ../raw_data/samples.HiFi_Nano.list | awk 'BEGIN{ORS=""; print "java -mx400g -jar /xxx/inGAP-family-1.0.0/inGAP-family.jar MRG -l "}{print "../alignment_ref/"$2"/14ingap_out/"$3".col_pek.ingap.flt.vcf,"}END{print " -o ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.pre_mrg.vcf &\n"}' 
+
+cat ../raw_data/samples.HiFi_Nano.list | awk '{print "java -mx35g -jar /xxx/inGAP-family-1.0.0/inGAP-family.jar ALE -t ../ref_genome/Col-PEK1.5-Chr1-5_20220523.full.cen_masked.fasta.2.7.7.80.10.10.20.dat -l ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.pre_mrg.list -s ../alignment_ref/"$2"/10bwa_out/"$3".col_pek.srt.rmdup.sam -o ../alignment_ref/"$2"/10bwa_out/72accs.col_pek.ingap.flt.pre_mrg."$3".geno.vcf"}' | while read r; do "${r}"; done
+
+cat ../raw_data/samples.HiFi_Nano.list | awk 'BEGIN{ORS=""; print "java -mx500g -jar /xxx/inGAP-family-1.0.0/inGAP-family.jar MRG -l "}{print "../alignment_ref/"$2"/10bwa_out/72accs.col_pek.ingap.flt.pre_mrg."$3".geno.vcf,"}END{print " -o ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.vcf \n"}' | while read r; do "${r}"; done
+
+cat ../raw_data/samples.HiFi_Nano.list | awk 'BEGIN{ORS=""; print "java -mx920g -jar /xxx/inGAP-family-1.0.0/inGAP-family.jar MRG -l "}{print "../alignment_ref/"$2"/10bwa_out/72accs.col_pek.ingap.flt.pre_mrg."$3".geno.vcf,"}END{print " -o ../alignment_ref/72merged_snps/72accs.col_pek.ingap.flt.fin_mrg.vcf \n"}' | while read r; do "${r}"; done
+
+
+
+##########################################################################################################################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################################################################################################
