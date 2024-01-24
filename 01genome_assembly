@@ -155,16 +155,16 @@ cp /xxx/genome_assembly/AtAre1/01Canu_out/Nanopore_Are-1.trim.flt.correctedReads
 gunzip Nanopore_Are-1.trim.flt.correctedReads.fasta.gz 
 ln -sf ../ragoo_output_t2t_corr/Are-1.ragoo.fasta . 
 cd gap_closing_reads 
-/netscratch/dep_mercier/grp_mercier/software/software_installpackages/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../Are-1.ragoo.fasta -q ../Nanopore_Are-1.trim.flt.correctedReads.fasta -t 8 > nohup.run_close_scaffold_gaps.1.log 2>&1 
+/xxx/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../Are-1.ragoo.fasta -q ../Nanopore_Are-1.trim.flt.correctedReads.fasta -t 8 > nohup.run_close_scaffold_gaps.1.log 2>&1 
 ln -sf Are-1.ragoo.fasta.split.joined.fa Are-1.ragoo.gapclosing_reads.fasta 
 ragtag.py splitasm Are-1.ragoo.gapclosing_reads.fasta -o Are-1.ragoo.gapclosing_reads.ragtag.agp > Are-1.ragoo.gapclosing_reads.ragtag.split.fa 
 rm ../Nanopore_Are-1.trim.flt.correctedReads.fasta 
 cd ../gap_closing_smartdenovo 
-/netscratch/dep_mercier/grp_mercier/software/software_installpackages/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_reads/Are-1.ragoo.gapclosing_reads.fasta -q ../../../03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.fa -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.2.log 2>&1 
+/xxx/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_reads/Are-1.ragoo.gapclosing_reads.fasta -q ../../../03SMARTdenovo_out/racon_out/nextpolish_out/purge_dups/Are-1.smartdenovo_ass_polished.purged.fa -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.2.log 2>&1 
 ln -sf Are-1.ragoo.gapclosing_reads.fasta.split.joined.fa Are-1.ragoo.gapclosing_reads_smartdenovo.fasta 
 ragtag.py splitasm Are-1.ragoo.gapclosing_reads_smartdenovo.fasta -o Are-1.ragoo.gapclosing_reads_smartdenovo.ragtag.agp > Are-1.ragoo.gapclosing_reads_smartdenovo.ragtag.split.fa 
 cd ../gap_closing_smartdenovo_flye 
-/netscratch/dep_mercier/grp_mercier/software/software_installpackages/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_smartdenovo/Are-1.ragoo.gapclosing_reads_smartdenovo.fasta -q ../../../02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.fa -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.3.log 2>&1 
+/xxx/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_smartdenovo/Are-1.ragoo.gapclosing_reads_smartdenovo.fasta -q ../../../02Flye_out00/racon_out/nextpolish_out/purge_dups/Are-1.flye_ass_polished.purged.fa -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.3.log 2>&1 
 ln -sf Are-1.ragoo.gapclosing_reads_smartdenovo.fasta.split.joined.fa Are-1.ragoo.gapclosing_reads_smartdenovo_flye.fasta 
 ragtag.py splitasm Are-1.ragoo.gapclosing_reads_smartdenovo_flye.fasta -o Are-1.ragoo.gapclosing_reads_smartdenovo_flye.ragtag.agp > Are-1.ragoo.gapclosing_reads_smartdenovo_flye.ragtag.split.fa 
 cd .. 
@@ -321,20 +321,20 @@ cp /xxx/raw_data/batch1/5129_A.hifi_reads.fastq.gz .
 gunzip 5129_A.hifi_reads.fastq.gz 
 ln -sf ../ragoo_output_t2t_corr/Db-1.ragoo.fasta . 
 cd gap_closing_reads 
-/netscratch/dep_mercier/grp_mercier/software/software_installpackages/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../Db-1.ragoo.fasta -q ../5129_A.hifi_reads.fastq -t 8 > nohup.run_close_scaffold_gaps.1.log 2>&1 
+/xxx/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../Db-1.ragoo.fasta -q ../5129_A.hifi_reads.fastq -t 8 > nohup.run_close_scaffold_gaps.1.log 2>&1 
 ln -sf Db-1.ragoo.fasta.split.joined.fa Db-1.ragoo.gapclosing_reads.fasta 
 ragtag.py splitasm Db-1.ragoo.gapclosing_reads.fasta -o Db-1.ragoo.gapclosing_reads.ragtag.agp > Db-1.ragoo.gapclosing_reads.ragtag.split.fa 
 rm ../5129_A.hifi_reads.fastq 
 cd ../gap_closing_hifiasm 
-/netscratch/dep_mercier/grp_mercier/software/software_installpackages/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_reads/Db-1.ragoo.gapclosing_reads.fasta -q ../../../03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass.purged.fa -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.2.log 2>&1 
+/xxx/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_reads/Db-1.ragoo.gapclosing_reads.fasta -q ../../../03Hifiasm_out00/purge_dups/Db-1.hifiasm_ass.purged.fa -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.2.log 2>&1 
 ln -sf Db-1.ragoo.gapclosing_reads.fasta.split.joined.fa Db-1.ragoo.gapclosing_reads_hifiasm.fasta 
 ragtag.py splitasm Db-1.ragoo.gapclosing_reads_hifiasm.fasta -o Db-1.ragoo.gapclosing_reads_hifiasm.ragtag.agp > Db-1.ragoo.gapclosing_reads_hifiasm.ragtag.split.fa 
 cd ../gap_closing_hifiasm_flye 
-/netscratch/dep_mercier/grp_mercier/software/software_installpackages/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_hifiasm/Db-1.ragoo.gapclosing_reads_hifiasm.fasta -q ../../../02Flye_out00/assembly.fasta -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.3.log 2>&1 
+/xxx/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_hifiasm/Db-1.ragoo.gapclosing_reads_hifiasm.fasta -q ../../../02Flye_out00/assembly.fasta -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.3.log 2>&1 
 ln -sf Db-1.ragoo.gapclosing_reads_hifiasm.fasta.split.joined.fa Db-1.ragoo.gapclosing_reads_hifiasm_flye.fasta 
 ragtag.py splitasm Db-1.ragoo.gapclosing_reads_hifiasm_flye.fasta -o Db-1.ragoo.gapclosing_reads_hifiasm_flye.ragtag.agp > Db-1.ragoo.gapclosing_reads_hifiasm_flye.ragtag.split.fa 
 cd ../gap_closing_hifiasm_flye_canu 
-/netscratch/dep_mercier/grp_mercier/software/software_installpackages/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_hifiasm_flye/Db-1.ragoo.gapclosing_reads_hifiasm_flye.fasta -q ../../../01Canu_out/purge_dups/Db-1.canu_ass.purged.fa -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.4.log 2>&1 
+/xxx/MaSuRCA-4.1.0/bin/close_scaffold_gaps.sh -r ../gap_closing_hifiasm_flye/Db-1.ragoo.gapclosing_reads_hifiasm_flye.fasta -q ../../../01Canu_out/purge_dups/Db-1.canu_ass.purged.fa -t 8 -d asm -m 2500 -o 10000 > nohup.run_close_scaffold_gaps.4.log 2>&1 
 ln -sf Db-1.ragoo.gapclosing_reads_hifiasm_flye.fasta.split.joined.fa Db-1.ragoo.gapclosing_reads_hifiasm_flye_canu.fasta 
 ragtag.py splitasm ./Db-1.ragoo.gapclosing_reads_hifiasm_flye_canu.fasta -o ./Db-1.ragoo.gapclosing_reads_hifiasm_flye_canu.ragtag.agp > ./Db-1.ragoo.gapclosing_reads_hifiasm_flye_canu.ragtag.split.fa 
 cd .. 
