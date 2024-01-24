@@ -4,9 +4,22 @@
 ######
 #Annoate TEs, use Db-1 as an example
 
+#Annoate TEs with EDTA for each accession
 cd ../genome_assembly/Db-1/06TE_anno00 
 ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish_corr/ragoo.fasta genome.fa 
-EDTA.pl --genome ./genome.fa --cds /netscratch/dep_mercier/grp_mercier/Databases/Ath_refGenome/Athaliana_447_Araport11.cds_primaryTranscriptOnly.fa --overwrite 1 --sensitive 1 --anno 1 --evaluate 1 --threads 8 > nohup.run_edta.logs 2>&1
+EDTA.pl --genome ./genome.fa --cds /netscratch/dep_mercier/grp_mercier/Databases/Ath_refGenome/Athaliana_447_Araport11.cds_primaryTranscriptOnly.fa --overwrite 1 --sensitive 1 --anno 1 --evaluate 1 --threads 8 
+
+#Make panEDTA library
+mkdir ../pan_genome/panEDTA_lib
+ls ../genome_assembly/*/06TE_anno00/genome.fa.mod.EDTA.TElib.fa > ../pan_genome/panEDTA_lib/TElib.list
+nohup /netscratch/dep_mercier/grp_mercier/software/software_installpackages/EDTA/util/make_panTElib.pl -liblist ../pan_genome/panEDTA_lib/TElib.list -threads 48 
+
+#Annoate TEs with EDTA (panEDTA_lib) for each accession
+cp -rp ../genome_assembly/Db-1/06TE_anno00 ../genome_assembly/Db-1/06TE_anno_pan 
+cd ../genome_assembly/Db-1/06TE_anno_pan 
+ln -sf /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/pan_genome/panEDTA_lib/TElib.list.panTE.fa . 
+RepeatMasker -pa 8 -q -div 40 -cutoff 225 -lib ./TElib.list.panTE.fa -gff ./genome.fa 
+EDTA.pl --genome ./genome.fa --cds /netscratch/dep_mercier/grp_mercier/Databases/Ath_refGenome/Athaliana_447_Araport11.cds_primaryTranscriptOnly.fa --curatedlib ./TElib.list.panTE.fa --step final --overwrite 1 --anno 1 --rmout ./genome.fa.out --threads 8 
 
 
 ##########################################################################################################################################################################################################################################################################################################################################
