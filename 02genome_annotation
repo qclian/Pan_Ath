@@ -10,7 +10,7 @@ grep ">" ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/genome.
 cut -f1 ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Mt_Ct_LASTZ_out/Are-1.flye_ass_polished.len > ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Mt_Ct_LASTZ_out/Are-1.flye_ass_polished.contig_list 
 cd ../genome_assembly/AtAre1/02Flye_out00/racon_out/nextpolish_out/Mt_Ct_LASTZ_out 
 fasta_separator ./Are-1.flye_ass_polished.fa 
-while read ctg; do echo "lastz /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrM.fasta chr${ctg}.fa --identity=80 --coverage=90 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Are-1.flye_ass_polished.${ctg}.ChrM.lastz.out.txt"; echo "lastz /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrC.fasta chr${ctg}.fa --identity=80 --coverage=90 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Are-1.flye_ass_polished.${ctg}.ChrC.lastz.out.txt"; done < ./Are-1.flye_ass_polished.contig_list > run_lastz_mt_ct 
+while read ctg; do echo "lastz /xxx/ref_genome/t2t-col.20210610.ChrM.fasta chr${ctg}.fa --identity=80 --coverage=90 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Are-1.flye_ass_polished.${ctg}.ChrM.lastz.out.txt"; echo "lastz /xxx/ref_genome/t2t-col.20210610.ChrC.fasta chr${ctg}.fa --identity=80 --coverage=90 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Are-1.flye_ass_polished.${ctg}.ChrC.lastz.out.txt"; done < ./Are-1.flye_ass_polished.contig_list > run_lastz_mt_ct 
 ./run_lastz_mt_ct 
 
 #quickmerge assembly
@@ -18,7 +18,7 @@ grep ">" ../genome_assembly/AtAre1/04quickmerge_out00/Are-1.smartdenovo_flye_mer
 cut -f1 ../genome_assembly/AtAre1/04quickmerge_out00/Mt_Ct_LASTZ_out/Are-1.smartdenovo_flye_merge.purged.len > ../genome_assembly/AtAre1/04quickmerge_out00/Mt_Ct_LASTZ_out/Are-1.smartdenovo_flye_merge.purged.contig_list 
 cd ../genome_assembly/AtAre1/04quickmerge_out00/Mt_Ct_LASTZ_out 
 fasta_separator ../Are-1.smartdenovo_flye_merge.purged.fa 
-while read ctg; do echo "lastz /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrM.fasta chr${ctg}.fa --identity=80 --coverage=90 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Are-1.smartdenovo_flye_merge.purged.${ctg}.ChrM.lastz.out.txt"; echo "lastz /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrC.fasta chr${ctg}.fa --identity=80 --coverage=90 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Are-1.smartdenovo_flye_merge.purged.${ctg}.ChrC.lastz.out.txt"; done < ./Are-1.smartdenovo_flye_merge.purged.contig_list > run_lastz_mt_ct 
+while read ctg; do echo "lastz /xxx/ref_genome/t2t-col.20210610.ChrM.fasta chr${ctg}.fa --identity=80 --coverage=90 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Are-1.smartdenovo_flye_merge.purged.${ctg}.ChrM.lastz.out.txt"; echo "lastz /xxx/ref_genome/t2t-col.20210610.ChrC.fasta chr${ctg}.fa --identity=80 --coverage=90 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Are-1.smartdenovo_flye_merge.purged.${ctg}.ChrC.lastz.out.txt"; done < ./Are-1.smartdenovo_flye_merge.purged.contig_list > run_lastz_mt_ct 
 ./run_lastz_mt_ct 
 
 
@@ -30,7 +30,7 @@ grep ">" ../genome_assembly/Db-1/04quickmerge_out000/Db-1.canu_flye_hifiasm.merg
 cd ../genome_assembly/Db-1/04quickmerge_out000/Mt_Ct_LASTZ_out 
 ln -s ../Db-1.canu_flye_hifiasm.merged.fasta Db-1.canu_flye_hifiasm.merged.fasta 
 fasta_separator ./Db-1.canu_flye_hifiasm.merged.fasta 
-while read ctg; do echo "lastz chr${ctg}.fa /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrM.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.canu_flye_hifiasm.${ctg}.ChrM.lastz.out.txt"; echo "lastz chr${ctg}.fa /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrC.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.canu_flye_hifiasm.${ctg}.ChrC.lastz.out.txt"; done < ./Db-1.canu_flye_hifiasm.merged.contig_list > run_lastz_mt_ct 
+while read ctg; do echo "lastz chr${ctg}.fa /xxx/ref_genome/t2t-col.20210610.ChrM.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.canu_flye_hifiasm.${ctg}.ChrM.lastz.out.txt"; echo "lastz chr${ctg}.fa /xxx/ref_genome/t2t-col.20210610.ChrC.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.canu_flye_hifiasm.${ctg}.ChrC.lastz.out.txt"; done < ./Db-1.canu_flye_hifiasm.merged.contig_list > run_lastz_mt_ct 
 ./run_lastz_mt_ct
 
 #scaffold assembly
@@ -38,7 +38,7 @@ grep ">" ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr/Db-1.
 cd ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr/Mt_Ct_LASTZ_out 
 ln -s ../Db-1.ragoo.fasta Db-1.ragoo.fasta 
 fasta_separator ./Db-1.ragoo.fasta 
-while read ctg; do echo "lastz chr${ctg}.fa /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrM.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.ragoo.${ctg}.ChrM.lastz.out.txt"; echo "lastz chr${ctg}.fa /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrC.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.ragoo.${ctg}.ChrC.lastz.out.txt"; done < ./Db-1.ragoo.contig_list > run_lastz_mt_ct 
+while read ctg; do echo "lastz chr${ctg}.fa /xxx/ref_genome/t2t-col.20210610.ChrM.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.ragoo.${ctg}.ChrM.lastz.out.txt"; echo "lastz chr${ctg}.fa /xxx/ref_genome/t2t-col.20210610.ChrC.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.ragoo.${ctg}.ChrC.lastz.out.txt"; done < ./Db-1.ragoo.contig_list > run_lastz_mt_ct 
 ./run_lastz_mt_ct
 
 #scaffold-corrected-gapclosed-polished assembly
@@ -46,7 +46,7 @@ grep ">" ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapcl
 cd ../genome_assembly/Db-1/04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Mt_Ct_LASTZ_out 
 ln -sf ../Db-1.ragoo.gapclosing.polished.fasta Db-1.ragoo.gapclosing.polished.fasta 
 fasta_separator ./Db-1.ragoo.gapclosing.polished.fasta 
-while read ctg; do echo "lastz chr${ctg}.fa /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrM.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.ragoo.gapclosing.polished.${ctg}.ChrM.lastz.out.txt"; echo "lastz chr${ctg}.fa /netscratch/dep_mercier/grp_mercier/Projects/PanGenome_of_Arabidopsis/ref_genome/t2t-col.20210610.ChrC.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.ragoo.gapclosing.polished.${ctg}.ChrC.lastz.out.txt"; done < ./Db-1.ragoo.gapclosing.polished.contig_list > run_lastz_mt_ct 
+while read ctg; do echo "lastz chr${ctg}.fa /xxx/ref_genome/t2t-col.20210610.ChrM.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.ragoo.gapclosing.polished.${ctg}.ChrM.lastz.out.txt"; echo "lastz chr${ctg}.fa /xxx/ref_genome/t2t-col.20210610.ChrC.fasta --identity=80 --coverage=5 --format=general:score,name1,strand1,size1,start1,end1,name2,strand2,identity,length1,align1 | sort -k5,5n > ./Db-1.ragoo.gapclosing.polished.${ctg}.ChrC.lastz.out.txt"; done < ./Db-1.ragoo.gapclosing.polished.contig_list > run_lastz_mt_ct 
 ./run_lastz_mt_ct
 
 
