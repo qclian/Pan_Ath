@@ -18,7 +18,7 @@ augustus_GFF3_to_EVM_GFF3.pl ./Db-1.temp.gff > ./Db-1.augustus.gff3
 
 #GeneMark
 cd /xxx/genome_assembly/Db-1/07Gene_anno/03GeneMark_out 
-gmes_petap.pl --ES --sequence ../../04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta --cores 5 > ./nohup.run_gmes.log 
+gmes_petap.pl --ES --sequence ../../04quickmerge_out000/ragoo_output_t2t_corr_gapclosing_polish/Db-1.ragoo.gapclosing.polished.fasta --cores 5 
 gtf2gff3.pl ./genemark.gtf | bedtools sort -i - > ./Db-1.genemark.gff3
 
 #GlimmerHMM
@@ -35,8 +35,8 @@ snap /xxx/snap/HMM/A.thaliana.hmm genome.fa -gff > Db-1.snap.gff
 
 
 #RNA-seq, Trinity + TransDecoder + CD-HIT, and then send to Exonerate
-/opt/share/software/packages/trinityrnaseq-2.14.0/bin/Trinity --seqType fq --max_memory 50G --CPU 8 --left ../raw_data/RNA_publicData/ERR1588809_1.trim.paired.fastq.gz,../raw_data/RNA_publicData/ERR1588810_1.trim.paired.fastq.gz --right ../raw_data/RNA_publicData/ERR1588809_2.trim.paired.fastq.gz,../raw_data/RNA_publicData/ERR1588810_2.trim.paired.fastq.gz --output ../transcriptome_assembly/Can-0_pe_trinity/ --full_cleanup --no_version_check > ../transcriptome_assembly/Can-0_pe_trinity/nohup.trinity.logs 2>&1 
-/opt/share/software/packages/trinityrnaseq-2.14.0/bin/Trinity --seqType fq --max_memory 50G --CPU 8 --single ../raw_data/RNA_publicData/SRR1046859.trim.fastq.gz,../raw_data/RNA_publicData/SRR1046860.trim.fastq.gz,../raw_data/RNA_publicData/SRR1046861.trim.fastq.gz --output ../transcriptome_assembly/Kn-0_se_trinity/ --full_cleanup --no_version_check > ../transcriptome_assembly/Kn-0_se_trinity/nohup.trinity.logs 2>&1 
+/xxx/trinityrnaseq-2.14.0/bin/Trinity --seqType fq --max_memory 50G --CPU 8 --left ../raw_data/RNA_publicData/ERR1588809_1.trim.paired.fastq.gz,../raw_data/RNA_publicData/ERR1588810_1.trim.paired.fastq.gz --right ../raw_data/RNA_publicData/ERR1588809_2.trim.paired.fastq.gz,../raw_data/RNA_publicData/ERR1588810_2.trim.paired.fastq.gz --output ../transcriptome_assembly/Can-0_pe_trinity/ --full_cleanup --no_version_check 
+/xxx/trinityrnaseq-2.14.0/bin/Trinity --seqType fq --max_memory 50G --CPU 8 --single ../raw_data/RNA_publicData/SRR1046859.trim.fastq.gz,../raw_data/RNA_publicData/SRR1046860.trim.fastq.gz,../raw_data/RNA_publicData/SRR1046861.trim.fastq.gz --output ../transcriptome_assembly/Kn-0_se_trinity/ --full_cleanup --no_version_check 
 
 TransDecoder.LongOrfs -t ../transcriptome_assembly/Bay0_se_trinity.Trinity.fasta --output_dir ../transcriptome_assembly/Bay0_se_transdecoder
 /opt/share/software/packages/diamond-v2.0.4/bin/diamond blastp -q ../transcriptome_assembly/Bay0_se_transdecoder/longest_orfs.pep -d /xxx/Databases/UniProt_2022/uniprot_sprot.fasta -k 1 -f 6 -e 1e-5 --ultra-sensitive -p 4 -o ../transcriptome_assembly/Bay0_se_transdecoder/blastp.outfmt6 
@@ -44,7 +44,7 @@ TransDecoder.Predict -t ../transcriptome_assembly/Bay0_se_trinity.Trinity.fasta 
 
 mkdir ../pan_genome/panPep_lib
 cat ../AMPRILS/*protein-coding.genes.v2.5.protein.fasta ../transcriptome_assembly/*_transdecoder/*_trinity.Trinity.fasta.transdecoder.pep > ../pan_genome/panPep_lib/PEPlib.list.panPEP.fa
-nohup /opt/share/software/packages/cdhit-4.6.8/bin/cd-hit -i ../pan_genome/panPep_lib/PEPlib.list.panPEP.fa -o ../pan_genome/panPep_lib/PEPlib.list.panPEP.c98.fa -c 0.98 -M 80000 -T 48 > ./logs/nohup.run_panPEP.cdhit.logs 2>&1 &
+nohup /opt/share/software/packages/cdhit-4.6.8/bin/cd-hit -i ../pan_genome/panPep_lib/PEPlib.list.panPEP.fa -o ../pan_genome/panPep_lib/PEPlib.list.panPEP.c98.fa -c 0.98 -M 80000 -T 48 
 
 
 #Exonerate
@@ -103,11 +103,11 @@ cat ../05Exonerate_out/Db-1.Aly.exonerate.gff3 | sed "s/exonerate/exonerate.Aly/
 cat ../05Exonerate_out/Db-1.Sly.exonerate.gff3 | sed "s/exonerate/exonerate.Sly/g" >> exonerate.v2.gff3 
 cat ../05Exonerate_out/Db-1.Osa.exonerate.gff3 | sed "s/exonerate/exonerate.Osa/g" >> exonerate.v2.gff3 
 cat ../05Exonerate_out/Db-1.panPEP.exonerate.gff3 | sed "s/exonerate/exonerate.panPEP/g" >> exonerate.v2.gff3 
-partition_EVM_inputs.pl --genome genome.fa --gene_predictions denovo.gff3 --protein_alignments exonerate.v2.gff3 --segmentSize 100000 --overlapSize 10000 --partition_listing partitions_list.out > nohup.partition_EVM_inputs.log 2>&1 
+partition_EVM_inputs.pl --genome genome.fa --gene_predictions denovo.gff3 --protein_alignments exonerate.v2.gff3 --segmentSize 100000 --overlapSize 10000 --partition_listing partitions_list.out 
 write_EVM_commands.pl --genome genome.fa --weights /xxx/run_scripts/evidencemodeler_weights.v2.txt --gene_predictions denovo.gff3 --protein_alignments exonerate.v2.gff3 --output_file_name evm.out.v2 --partitions partitions_list.out > commands.list.v2 
 ./commands.list.v2 
-recombine_EVM_partial_outputs.pl --partitions partitions_list.out --output_file_name evm.out.v2 > nohup.recombine_EVM_partial_outputs.v2.log 2>&1 
-convert_EVM_outputs_to_GFF3.pl --partitions partitions_list.out --output evm.out.v2 --genome genome.fa > nohup.convert_EVM_outputs_to_GFF3.v2.log 2>&1 
+recombine_EVM_partial_outputs.pl --partitions partitions_list.out --output_file_name evm.out.v2 
+convert_EVM_outputs_to_GFF3.pl --partitions partitions_list.out --output evm.out.v2 --genome genome.fa 
 find . -regex ".*evm.out.v2.gff3" | sort -V | xargs cat | grep EVM > Db-1.EVM.v2.gff 
 cat Db-1.EVM.v2.gff | awk 'BEGIN{OFS="\t";acc="Db1";print "##gff-version 3"}{if($1 in chrs){chrs[$1]=1}else{chrs[$1]=1;if($1~/Chr/){split($1,a,"Chr");chr_id=a[2];idx=10000}else{if(chr_id!="U"){idx=10000};chr_id="U"}};if($3=="gene"){idx+=10;gene_id="AT"acc"-"chr_id"G"idx; print $1,$2,$3,$4,$5,$6,$7,$8,"ID="gene_id;exon_id=0;cds_id=0};if($3=="mRNA"){mrna_id="AT"acc"-"chr_id"G"idx".1"; print $1,$2,$3,$4,$5,$6,$7,$8,"ID="mrna_id";Parent="gene_id};if($3=="exon"){exon_id+=1; print $1,$2,$3,$4,$5,$6,$7,$8,"ID="mrna_id".exon"exon_id";Parent="mrna_id};if($3=="CDS"){cds_id+=1; print $1,$2,$3,$4,$5,$6,$7,$8,"ID="mrna_id".cds"cds_id";Parent="mrna_id}}' > Db-1.EVM.v2.5.gff 
 gff3_file_to_proteins.pl Db-1.EVM.v2.5.gff genome.fa prot | sed "s/\.1.*//g" 1> Db-1.EVM.v2.5.protein.fasta 2> nohup.gff3_file_to_proteins.prot.v2.5.log 
